@@ -1,13 +1,25 @@
 const express = require('express')
-const http = require('http')
 const app = express();
-const server = http.createServer(app);
-const PORT = 5050;
+const PORT = 5050 || process.env.PORT;
+const mongoose = require('mongoose');
+const {MONGO_URI} =  require('./keys');
 
-app.get("/", (req,res)=> {
-	res.send("Hello from Server");
+
+require('./models/user');
+app.use(express.json());
+app.use(require("./routes/auth"));
+
+mongoose.connect(MONGO_URI, {
+ useNewUrlParser: true,
+ useUnifiedTopology: true
+})
+mongoose.connection.on("connected", () => {
+	console.log("Connected to mongodb!");
+})
+mongoose.connection.on("error", () => {
+	console.log("ERROR! Cannot connect to database");
 })
 
-server.listen(PORT, () => {
-	console.log(`Server is listening at http://localhost:${PORT}/`);
+app.listen(PORT, () => {
+	console.log(`Server is listening at: ${PORT}`);
 })
