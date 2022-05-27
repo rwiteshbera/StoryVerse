@@ -16,8 +16,8 @@ mongoose.connect(MONGO_URI, {
 mongoose.connection.on("connected", () => {
 	console.log("Connected to mongodb!");
 })
-mongoose.connection.on("error", () => {
-	console.log("ERROR! Cannot connect to database");
+mongoose.connection.on("error", (err) => {
+	console.log("ERROR! Cannot connect to database ", err);
 })
 
 app.listen(PORT, () => {
