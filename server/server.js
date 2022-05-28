@@ -4,21 +4,30 @@ const PORT = 5050 || process.env.PORT;
 const mongoose = require('mongoose');
 const {MONGO_URI} =  require('./keys');
 
+// Database configuration
+mongoose.connect(MONGO_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+   })
+   mongoose.connection.on("connected", () => {
+	   console.log("Connected to mongodb!");
+   })
+   mongoose.connection.on("error", (err) => {
+	   console.log("ERROR! Cannot connect to database ", err);
+   })
+
+
 
 require('./models/user');
-app.use(express.json());
-app.use(require("./routes/auth"));
+require('./models/post');
 
-mongoose.connect(MONGO_URI, {
- useNewUrlParser: true,
- useUnifiedTopology: true
-})
-mongoose.connection.on("connected", () => {
-	console.log("Connected to mongodb!");
-})
-mongoose.connection.on("error", (err) => {
-	console.log("ERROR! Cannot connect to database ", err);
-})
+app.use(express.json());
+
+// React Router
+app.use(require("./routes/auth"));
+app.use(require("./routes/post"));
+
+
 
 app.listen(PORT, () => {
 	console.log(`Server is listening at: ${PORT}`);
