@@ -4,16 +4,25 @@ const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const requireLogin = require('../middleware/requireLogin')
 
+router.get('/allPosts', (req, res) => {
+    Post.find()
+    .populate("postedBy", "name email")
+    .then((posts) => {
+        res.json({posts: posts})
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
 
 router.post('/createPost', requireLogin, (req, res) => {
     const {captions} = req.body;
     if(!captions) {
         return res.status(422).json({error: "Please add a description"})
     }
-    console.log(req.user)
     const post = new Post({
         captions: captions,
-        postedBy: req.user.name
+        postedBy: req.user
     })
 
     post.save()
@@ -24,5 +33,16 @@ router.post('/createPost', requireLogin, (req, res) => {
     })
 })
 
+
+// All the post created by that user
+router.get('/mypost', requireLogin, (req, res) => {
+    Post.find({postedBy: req.user._id})
+    .then((res) => {
+        console.log(res)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
 
 module.exports = router;
