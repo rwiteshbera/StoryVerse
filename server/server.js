@@ -17,7 +17,7 @@ mongoose.connect(MONGO_URI, {
    })
 
 
-
+// Database Schema
 require('./models/user');
 require('./models/post');
 
