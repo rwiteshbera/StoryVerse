@@ -2,7 +2,10 @@ const express = require('express')
 const app = express();
 const PORT = 5050 || process.env.PORT;
 const mongoose = require('mongoose');
+const cors = require('cors');
 const {MONGO_URI} =  require('./keys');
+
+app.use(cors);
 
 // Database configuration
 mongoose.connect(MONGO_URI, {
