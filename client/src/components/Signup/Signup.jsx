@@ -8,13 +8,23 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const PostData = () => {
-    
+  const PostData = async () => {
+    if(!name || !email || !password) {
+      return;
+    }
+    const axiosConfig = {
+      headers: {
+        'Content-type':"application/json"
+      }
+    }
+
+    const {data} = await axios.post('http://localhost:5050/signup', {name, email, password}, axiosConfig);
+
+    console.log(JSON.stringify(data))
   }
 
   return (
     <>
-      <form>
         <input type="text" placeholder="full name" value={name} onChange={(e)=>setName(e.target.value)}></input>
         <input type="email" placeholder="email" value={email} onChange={(e)=>setEmail(e.target.value)}></input>
         <input type="password" placeholder="password" value={password}  onChange={(e)=>setPassword(e.target.value)}></input>
@@ -22,7 +32,6 @@ const Signup = () => {
         <Link to="/login">
           <div>Already have an account?</div>
         </Link>
-      </form>
     </>
   );
 };

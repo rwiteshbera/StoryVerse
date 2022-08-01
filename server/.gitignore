@@ -27,3 +27,4 @@ dist-ssr
 
 # Rwitesh
 keys.js
+.env
