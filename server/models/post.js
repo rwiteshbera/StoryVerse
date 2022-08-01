@@ -4,7 +4,7 @@ const {ObjectId} = mongoose.Schema.Types;
 const postSchema = new mongoose.Schema({
     photo: {
         type: String,
-        default: 'NO PHOTO'
+        required: true
     },
     captions: {
         type: String,

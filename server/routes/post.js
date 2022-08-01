@@ -16,12 +16,14 @@ router.get('/allPosts', (req, res) => {
 })
 
 router.post('/createPost', requireLogin, (req, res) => {
-    const {captions} = req.body;
-    if(!captions) {
-        return res.status(422).json({error: "Please add a description"})
+    try{
+        const {captions, url} = req.body;
+    if(!captions || !url) {
+        return res.status(422).json({error: "Please fill all the fields"})
     }
     const post = new Post({
         captions: captions,
+        photo: url,
         postedBy: req.user
     })
 
@@ -31,6 +33,9 @@ router.post('/createPost', requireLogin, (req, res) => {
     }).catch((err) => {
         res.status(401).json({err})
     })
+    } catch(error) {
+        res.json({"Failed to upload data" : error})
+    }
 })
 
 

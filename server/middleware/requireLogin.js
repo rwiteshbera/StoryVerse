@@ -4,10 +4,13 @@ const mongoose = require('mongoose')
 const User = mongoose.model('User')
 
 module.exports = (req,res,next) => {
-    const{authorization} = req.headers;
+    try {
+        const authorization = req.headers.authorization;
+        console.log(req.headers.authorization)
     // authorization === Bearer JSON_WEBTOKEN
     if(!authorization) {
-        return res.status(401).json({error: "You must be logged in"})
+        console.log("Authorization Failed");
+        return res.status(401).json({error: "Authorization failed"})
     }
 
     const token = req.headers.authorization.split(' ')[1];
@@ -23,4 +26,7 @@ module.exports = (req,res,next) => {
             next();
         })
     })
+    } catch (error) {
+      console.log(error)  
+    }
 }

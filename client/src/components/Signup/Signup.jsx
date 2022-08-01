@@ -9,18 +9,22 @@ const Signup = () => {
   const [password, setPassword] = useState("");
 
   const PostData = async () => {
-    if(!name || !email || !password) {
-      return;
-    }
-    const axiosConfig = {
-      headers: {
-        'Content-type':"application/json"
+    try {
+      if(!name || !email || !password) {
+        return;
       }
+      const axiosConfig = {
+        headers: {
+          'Content-type':"application/json"
+        }
+      }
+  
+      const {data} = await axios.post('http://localhost:5050/signup', {name, email, password}, axiosConfig);
+  
+      console.log(JSON.stringify(data))
+    } catch (error) {
+      console.log("ERROR" + error);
     }
-
-    const {data} = await axios.post('http://localhost:5050/signup', {name, email, password}, axiosConfig);
-
-    console.log(JSON.stringify(data))
   }
 
   return (
