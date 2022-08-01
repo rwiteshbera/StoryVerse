@@ -7,6 +7,8 @@ const CreatePost = () => {
   const [captions, setCaptions] = useState("");
   const [image, setImage] = useState();
   const [url, setUrl] = useState("");
+  let token = localStorage.getItem("token");
+
 
   const Upload = async () => {
     const data = new FormData();
@@ -17,6 +19,7 @@ const CreatePost = () => {
     const axiosConfig = {
       headers: {
         "Content-type": "application/json",
+        "Authorization": token
       },
     };
 
@@ -34,7 +37,7 @@ const CreatePost = () => {
         axiosConfig
       );
 
-      console.log(info);
+      console.log("SUCCESS");
     } catch (error) {
       console.log(error);
     }

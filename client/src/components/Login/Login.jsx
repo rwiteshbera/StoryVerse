@@ -23,7 +23,10 @@ const Login = () => {
   
       const {data} = await axios.post('http://localhost:5050/signin', {email, password}, axiosConfig);
   
-      console.log(JSON.stringify(data))
+      localStorage.setItem("token", `Bearer ${data.token}`)
+
+      console.log("Logged in successfully!")
+
       navigate('/');
     } catch (error) {
       console.log("ERROR" + error);

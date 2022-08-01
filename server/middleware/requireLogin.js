@@ -6,7 +6,6 @@ const User = mongoose.model('User')
 module.exports = (req,res,next) => {
     try {
         const authorization = req.headers.authorization;
-        console.log(req.headers.authorization)
     // authorization === Bearer JSON_WEBTOKEN
     if(!authorization) {
         console.log("Authorization Failed");
