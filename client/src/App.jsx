@@ -1,16 +1,28 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Navbar from "./components/Navbar/Navbar";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import Home from "./components/Home/Home";
 import Login from "./components/Login/Login";
 import Signup from "./components/Signup/Signup";
 import Profile from "./components/Profile/Profile";
 import CreatePost from "./components/Home/CreatePost";
+import NotFound from "./components/404NotFound/NotFound";
+
 
 const App = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if(user) {
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
+  }, [])
+
   return (
     <>
-      <BrowserRouter>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />}></Route>
@@ -18,8 +30,8 @@ const App = () => {
           <Route path="/signup" element={<Signup />}></Route>
           <Route path="/create" element={<CreatePost />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
+          <Route path="*" element={<NotFound />}></Route>
         </Routes>
-      </BrowserRouter>
     </>
   );
 };

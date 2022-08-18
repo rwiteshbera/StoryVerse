@@ -24,10 +24,12 @@ const Login = () => {
       const {data} = await axios.post('http://localhost:5050/signin', {email, password}, axiosConfig);
   
       localStorage.setItem("token", `Bearer ${data.token}`)
+      localStorage.setItem("user", `${data.name}`)
 
       console.log("Logged in successfully!")
 
       navigate('/');
+      
     } catch (error) {
       console.log("ERROR" + error);
     }

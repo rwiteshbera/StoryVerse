@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./signup.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Signup = () => {
+  let navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +23,8 @@ const Signup = () => {
       const {data} = await axios.post('http://localhost:5050/signup', {name, email, password}, axiosConfig);
   
       console.log(JSON.stringify(data))
+      navigate('/');
+      
     } catch (error) {
       console.log("ERROR" + error);
     }

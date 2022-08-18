@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Profile.css";
 
 import ProfilePic from "./profile.jpg";
 
 const Profile = () => {
+
   return (
     <>
       <div>
