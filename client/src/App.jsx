@@ -15,7 +15,7 @@ const App = () => {
   useEffect(() => {
     const user = localStorage.getItem('user');
     if(user) {
-      navigate('/');
+      // navigate('/');
     } else {
       navigate('/login');
     }

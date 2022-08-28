@@ -6,9 +6,11 @@
 #gallery{
     display: flex;
     flex-wrap: wrap;
-    row-gap: 1rem;
-    column-gap: 1rem;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
+    flex-direction: row;
 }
 #gallery img{
-    width: 40vw;
+    border: 2px solid red;
+    width: 15vw;
 }
