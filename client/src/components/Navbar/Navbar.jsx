@@ -8,6 +8,7 @@ const LoggedIn = () => {
   const logOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('id');
   }
   return (
     <>

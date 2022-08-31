@@ -42,10 +42,6 @@ const Home = () => {
     });
   }, []);
 
-  useEffect(() => {
-    console.log(feedData);
-  }, [feedData]);
-
   return (
     <div className="home">
       <div className="card home-card">
@@ -68,7 +64,6 @@ const Home = () => {
                   Unlike
                 </button>
                 <p>{item.captions}</p>
-                <input type="text" placeholder="Add comment" />
               </div>
             </>
           );

@@ -88,4 +88,27 @@ router.put("/unlike", requireLogin, (req, res) => {
     }
   });
 });
+
+router.delete("/delete/:postId", requireLogin, (req, res) => {
+  try {
+    console.log(req.params.postId)
+    const result = Post.findOne({_id: req.params.postId})
+    .populate("postedBy", "_id")
+    .exec((err, post)=> {
+      if(err || !post) {
+        return  console.log("ERROR")
+      }
+      post.remove()
+      .then((result)=> {
+        console.log(result)
+      })
+      .catch((error)=> {
+        console.log(error)
+      })
+    })
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;
