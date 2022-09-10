@@ -9,6 +9,8 @@ const LoggedIn = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('id');
+    localStorage.removeItem('following');
+    localStorage.removeItem('followers');
   }
   return (
     <>

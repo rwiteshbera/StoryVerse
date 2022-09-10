@@ -1,5 +1,5 @@
-import axios from "axios";
 import React, { useEffect } from "react";
+import axios from "axios";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import "./UserProfile.css";
@@ -19,7 +19,7 @@ const Profile = () => {
     headers: {
       "Content-type": "application/json",
       "responseType": "json",
-    //   "Authorization": token,
+      "Authorization": token,
     },
   };
 
@@ -31,15 +31,39 @@ const Profile = () => {
           );
           setUserPhotos(data.posts);
           setUserData(data.user);
+        
     }catch(e) {
         console.log(e)
     }
+  };
+  
+
+  const followUser = (id) => {
+    axios
+      .put("http://localhost:5050/follow", { followId: id }, axiosConfig)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const unFollowUser = (id) => {
+    axios
+      .put("http://localhost:5050/unfollow", { unfollowId: id }, axiosConfig)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
 
   useEffect(() => {
     fetchUserImage();
-  }, []);
+  });
 
   return (
     <>
@@ -50,14 +74,16 @@ const Profile = () => {
             
             style={{ borderRadius: "50%", margin: "2rem 4rem" }}
           />
-
+          {/* {console.log(userData._id)} */}
           <div>
             <h4>{userData.name}</h4>
             <div style={{ display: "flex", gap: "1rem"}}>
               <h5>Post: {userPhotos.length}</h5>
-              <h5>40 Following</h5>
-              <h5>40 Followers</h5>
+              <h5>{userData.following.length} following</h5>
+              <h5>{userData.followers.length} followers</h5>
             </div>
+            <button onClick={()=> {followUser(userData._id)}}>Follow</button>
+            <button onClick={()=> {unFollowUser(userData._id)}}>Unfollow</button>
           </div>
         </div>
 

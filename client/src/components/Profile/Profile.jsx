@@ -10,6 +10,8 @@ const Profile = () => {
 
   let token = localStorage.getItem("token");
   let userName = localStorage.getItem("user");
+  let following = localStorage.getItem("following");
+  let followers = localStorage.getItem("followers");
 
   const axiosConfig = {
     headers: {
@@ -25,7 +27,7 @@ const Profile = () => {
       axiosConfig
     );
     setMyPhotos(data);
-    // console.log(data)
+    console.log(data)
   };
 
   const deletePost =  (postId, userId) => {
@@ -54,10 +56,10 @@ const Profile = () => {
 
           <div>
             <h4>{userName}</h4>
-            <div style={{ display: "flex" }}>
-              <h5>40 Posts</h5>
-              <h5>40 Following</h5>
-              <h5>40 Followers</h5>
+            <div style={{ display: "flex", gap:"2rem"}}>
+              <h5>{myPhotos.length} Posts</h5>
+              <h5>{following} Following</h5>
+              <h5>{followers} Followers</h5>
             </div>
           </div>
         </div>

@@ -26,6 +26,9 @@ const Login = () => {
       localStorage.setItem("token", `Bearer ${data.token}`)
       localStorage.setItem("user", `${data.name}`)
       localStorage.setItem("id", `${data.userId}`)
+      localStorage.setItem("following", `${data.following}`)
+      localStorage.setItem("followers", `${data.followers}`)
+      console.log(data)
       navigate('/');
       
     } catch (error) {
