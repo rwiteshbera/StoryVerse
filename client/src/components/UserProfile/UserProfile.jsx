@@ -1,42 +1,41 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
-import "./Profile.css";
+import { useParams } from "react-router-dom";
+import "./UserProfile.css";
 
-import ProfilePic from "./profile.jpg";
+// import ProfilePic from "./profile.jpg";
 
 const Profile = () => {
-  const [myPhotos, setMyPhotos] = useState([]);
+  const [userPhotos, setUserPhotos] = useState([]); // User's posts
+  
+  const [userData, setUserData] = useState({}); // User's data : _id, name, email
 
   let token = localStorage.getItem("token");
-  let userName = localStorage.getItem("user");
+
+  const {userid}  = useParams();
 
   const axiosConfig = {
     headers: {
       "Content-type": "application/json",
       "responseType": "json",
-      "Authorization": token,
+    //   "Authorization": token,
     },
   };
 
   const fetchUserImage = async () => {
-    const { data } = await axios.get(
-      "http://localhost:5050/mypost",
-      axiosConfig
-    );
-    setMyPhotos(data);
-    // console.log(data)
-  };
-
-  const deletePost =  (postId, userId) => {
-    if(userId === localStorage.getItem("id")) {
-     axios.delete(`http://localhost:5050/delete/${postId}`, axiosConfig)
-     .then((res) => console.log(res))
-     .catch((e) => console.log(e))
-    } else {
-        console.log("Unable to delete the post!");
+    try {
+        const { data } = await axios.get(
+            `http://localhost:5050/user/${userid}`,
+            axiosConfig
+          );
+          setUserPhotos(data.posts);
+          setUserData(data.user);
+    }catch(e) {
+        console.log(e)
     }
   };
+
 
   useEffect(() => {
     fetchUserImage();
@@ -48,14 +47,14 @@ const Profile = () => {
         <div style={{ display: "flex" }}>
           <img
             id="profile-image"
-            src={ProfilePic}
+            
             style={{ borderRadius: "50%", margin: "2rem 4rem" }}
           />
 
           <div>
-            <h4>{userName}</h4>
-            <div style={{ display: "flex" }}>
-              <h5>40 Posts</h5>
+            <h4>{userData.name}</h4>
+            <div style={{ display: "flex", gap: "1rem"}}>
+              <h5>Post: {userPhotos.length}</h5>
               <h5>40 Following</h5>
               <h5>40 Followers</h5>
             </div>
@@ -63,10 +62,9 @@ const Profile = () => {
         </div>
 
         <div style={{ display: "flex" }} id="gallery">
-          {myPhotos.map((item, key) => {
+          {userPhotos.map((item, key) => {
             return (
               <>
-                <button onClick={() => deletePost(item._id, item.postedBy)}>Delete</button>
                 <img src={item.photo} key={item._id} />
               </>
             );

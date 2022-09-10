@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import "./Home.css";
 import imageFile from "./Image.png";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [feedData, setFeedData] = useState([]);
@@ -50,6 +51,7 @@ const Home = () => {
             <>
               {/* <h5>{item.postedBy.name}</h5> */}
               <div className="card-image">
+                <Link to={`/profile/${item.postedBy._id}`}>{item.postedBy.name}</Link>
                 <img src={item.photo} alt="image" />
               </div>
               <div className="card-content">

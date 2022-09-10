@@ -29,6 +29,7 @@ app.use(express.json());
 // React Router
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
+app.use(require("./routes/user"));
 
 app.listen(PORT, () => {
   console.log(`Server is listening at: http://localhost:${PORT}/`);
