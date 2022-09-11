@@ -4,8 +4,9 @@ const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const requireLogin = require("../middleware/requireLogin");
 
-router.get("/allPosts", (req, res) => {
-  Post.find()
+// Get the posts of the users you follow
+router.get("/feedPosts", requireLogin, (req, res) => {
+  Post.find({ postedBy: { $in : req.user.following}})
     .populate("postedBy", "name email")
     .then((posts) => {
       res.json({ posts: posts });
@@ -15,7 +16,7 @@ router.get("/allPosts", (req, res) => {
     });
 });
 
-router.post("/createPost", requireLogin, (req, res) => {
+router.post("/upload", requireLogin, (req, res) => {
   try {
     const { captions, url } = req.body;
     if (!captions || !url) {
@@ -45,7 +46,7 @@ router.get("/mypost", requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
     .then((myposts) => {
       // console.log(myposts);
-      return res.json(myposts);
+      // return res.json(myposts);
     })
     .catch((err) => {
       console.log(err);
@@ -57,7 +58,7 @@ router.put("/like", requireLogin, (req, res) => {
   Post.findByIdAndUpdate(
     req.body.postId,
     {
-      $push: { likes: req.user._id },
+      $addToSet: { likes: req.user._id },
     },
     {
       new: true,

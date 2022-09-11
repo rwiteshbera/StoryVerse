@@ -11,6 +11,9 @@ const Profile = () => {
   
   const [userData, setUserData] = useState({}); // User's data : _id, name, email
 
+  const [following, setFollowing] = useState(0);
+  const [followers, setFollowers] = useState(0);
+
   let token = localStorage.getItem("token");
 
   const {userid}  = useParams();
@@ -31,6 +34,8 @@ const Profile = () => {
           );
           setUserPhotos(data.posts);
           setUserData(data.user);
+          setFollowers(data.user.followers);
+          setFollowing(data.user.following);
         
     }catch(e) {
         console.log(e)
@@ -42,7 +47,7 @@ const Profile = () => {
     axios
       .put("http://localhost:5050/follow", { followId: id }, axiosConfig)
       .then((res) => {
-        console.log(res);
+        console.log(res)
       })
       .catch((e) => {
         console.log(e);
@@ -74,13 +79,12 @@ const Profile = () => {
             
             style={{ borderRadius: "50%", margin: "2rem 4rem" }}
           />
-          {/* {console.log(userData._id)} */}
           <div>
             <h4>{userData.name}</h4>
             <div style={{ display: "flex", gap: "1rem"}}>
               <h5>Post: {userPhotos.length}</h5>
-              <h5>{userData.following.length} following</h5>
-              <h5>{userData.followers.length} followers</h5>
+              <h5>{following.length} following</h5>
+              <h5>{followers.length} followers</h5>
             </div>
             <button onClick={()=> {followUser(userData._id)}}>Follow</button>
             <button onClick={()=> {unFollowUser(userData._id)}}>Unfollow</button>

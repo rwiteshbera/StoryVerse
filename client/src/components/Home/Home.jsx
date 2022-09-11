@@ -38,10 +38,10 @@ const Home = () => {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:5050/allposts", axiosConfig).then((res) => {
-      setFeedData(res.data.posts);
+    axios.get("http://localhost:5050/feedposts", axiosConfig).then((res) => {
+      setFeedData(res.data.posts.reverse());
     });
-  }, []);
+  },[]);
 
   return (
     <div className="home">

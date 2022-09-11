@@ -32,7 +32,7 @@ const CreatePost = () => {
       setUrl(imageInfo.data.secure_url);
 
       const  info  = await axios.post(
-        "http://localhost:5050/createPost",
+        "http://localhost:5050/upload",
         { captions, url },
         axiosConfig
       );
@@ -42,6 +42,7 @@ const CreatePost = () => {
       console.log(error);
     }
   };
+  
   return (
     <>
       <div className="card input-filled">
