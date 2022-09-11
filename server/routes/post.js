@@ -16,6 +16,7 @@ router.get("/feedPosts", requireLogin, (req, res) => {
     });
 });
 
+// Upload new image on socials
 router.post("/upload", requireLogin, (req, res) => {
   try {
     const { captions, url } = req.body;
@@ -41,6 +42,7 @@ router.post("/upload", requireLogin, (req, res) => {
   }
 });
 
+
 // All the post created by that user
 router.get("/mypost", requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
@@ -53,7 +55,7 @@ router.get("/mypost", requireLogin, (req, res) => {
     });
 });
 
-// Like and unlike
+// Like button
 router.put("/like", requireLogin, (req, res) => {
   Post.findByIdAndUpdate(
     req.body.postId,
@@ -72,6 +74,7 @@ router.put("/like", requireLogin, (req, res) => {
   });
 });
 
+// Unlike button
 router.put("/unlike", requireLogin, (req, res) => {
   Post.findByIdAndUpdate(
     req.body.postId,
@@ -90,6 +93,8 @@ router.put("/unlike", requireLogin, (req, res) => {
   });
 });
 
+
+// delete your own post
 router.delete("/delete/:postId", requireLogin, (req, res) => {
   try {
     console.log(req.params.postId)

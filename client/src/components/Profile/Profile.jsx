@@ -80,6 +80,9 @@ const Profile = () => {
         { profilePicURL: imageInfo.data.secure_url },
         axiosConfig
       );
+
+      setMyProfilePhoto(imageInfo.data.secure_url);
+
     } catch (error) {
       console.log(error);
     } 
@@ -88,7 +91,7 @@ const Profile = () => {
   useEffect(() => {
     fetchUserImage();
     fetchUserData();
-  });
+  }, [myProfilePhoto, myPhotos]); // Re-render when profile photo has been updated or uploaded new pics
 
   return (
     <>

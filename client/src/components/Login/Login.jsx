@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import "./Login.css";
 import axios from "axios";
@@ -10,7 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const PostData = async () => {
+  const LoginUser = async () => {
     try {
       if(!email || !password) {
         return;
@@ -26,20 +26,29 @@ const Login = () => {
       localStorage.setItem("token", `Bearer ${data.token}`)
       localStorage.setItem("user", `${data.name}`)
       localStorage.setItem("id", `${data.userId}`)
-      localStorage.setItem("following", `${data.following}`)
-      localStorage.setItem("followers", `${data.followers}`)
-      console.log(data)
+
       navigate('/');
+
+      Notification.requestPermission().then(perm => {
+        if(perm === 'granted') {
+          new Notification("Logged in");
+        }
+      })
       
     } catch (error) {
       console.log("ERROR" + error);
     }
   }
+
+  useEffect(() => {
+    Notification.requestPermission();
+  },[])
+
   return (
     <>
         <input type="email" placeholder='email' value={email} onChange={(e) => setEmail(e.target.value)}></input>
         <input type="password" placeholder='password' value={password} onChange={(e) => setPassword(e.target.value)}></input>
-        <button onClick={PostData}>Login</button>
+        <button onClick={LoginUser}>Login</button>
       <Link to="/signup"><div>Don't Have an account?</div></Link>
     </>
   )

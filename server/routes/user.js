@@ -43,7 +43,7 @@ router.get("/user/:id", requireLogin, (req, res) => {
     });
 });
 
-// Follow and Unfollow features
+// Follow users
 router.put("/follow", requireLogin, (req, res) => {
   User.findByIdAndUpdate(
     req.body.followId,
@@ -72,6 +72,7 @@ router.put("/follow", requireLogin, (req, res) => {
   });
 });
 
+// Unfollow users
 router.put("/unfollow", requireLogin, (req, res) => {
    User.findByIdAndUpdate(
     req.body.unfollowId,
@@ -98,6 +99,21 @@ router.put("/unfollow", requireLogin, (req, res) => {
         return res.status(422).json({ error: err });
       });
   });
+});
+
+
+// search user 
+router.post("/search", (req, res) => {
+    // "i" means ignoring case
+    let pattern = new RegExp("^" + req.body.query, "i");
+
+    User.find({name: {$regex:pattern}})
+    .then((user) => {
+      return res.json({user});
+    })
+    .catch((err) => {
+      return res.status(422).json({err});
+    })
 });
 
 module.exports = router;
