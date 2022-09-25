@@ -1,0 +1,16 @@
+#profile-image{
+    width: 180px;
+    height: 180px;
+}
+
+#gallery{
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 0.5rem;
+    flex-direction: row;
+}
+#gallery img{
+    border: 2px solid red;
+    width: 15vw;
+}

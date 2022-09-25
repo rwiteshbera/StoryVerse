@@ -78,6 +78,7 @@ const Navbar = () => {
             marginLeft={"5vw"}
             placeholder={"Search"}
             value={SearchInput}
+            autoComplete={"off"}
           />
           <Flex margin={"0.2rem 2rem"}>
             <li>

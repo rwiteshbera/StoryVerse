@@ -18,7 +18,9 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Button 
+  Button,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
 
 const Profile = () => {
@@ -32,8 +34,13 @@ const Profile = () => {
   const [myFollowing, setMyFollowing] = useState([]);
   const [myFollowers, setMyFollowers] = useState([]);
 
+  const [myFollowingDetails, setMyFollowingDetails] = useState([]);
+  const [myFollowersDetails, setMyFollowersDetails] = useState([]);
+
+  // Modal State
+  const [modalHeaderText, setModalHeaderText] = useState();
+
   let token = localStorage.getItem("token");
-  let userName = localStorage.getItem("user");
 
   const axiosConfig = {
     headers: {
@@ -60,8 +67,6 @@ const Profile = () => {
       setMyProfilePhoto(data.profilePhoto);
     } catch (e) {
       console.log(e);
-    } finally {
-      // console.log(myProfilePhoto)
     }
   };
 
@@ -108,6 +113,42 @@ const Profile = () => {
     }
   };
 
+  const getFollowing = async () => {
+    const info = await axios.post(
+      "http://localhost:5050/get_following",
+      { following: myFollowing },
+      axiosConfig
+    );
+    setMyFollowingDetails(info.data.users);
+  };
+
+  const getFollowers = async () => {
+    const info = await axios.post(
+      "http://localhost:5050/get_followers",
+      { following: myFollowers },
+      axiosConfig
+    );
+    setMyFollowersDetails(info.data.users);
+  };
+
+  const modalHandler = (e) => {
+    try {
+      if (e === "profile_photo") {
+        setModalHeaderText("Change Profile Photo");
+      } else if (e === "following") {
+        setModalHeaderText("Following");
+        getFollowing();
+      } else if (e === "followers") {
+        setModalHeaderText("Followers");
+        getFollowers();
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      onOpen();
+    }
+  };
+
   useEffect(() => {
     fetchUserImage();
     fetchUserData();
@@ -122,7 +163,7 @@ const Profile = () => {
             src={myProfilePhoto}
             w={"10rem"}
             borderRadius={"50%"}
-            onClick={onOpen}
+            onClick={() => modalHandler("profile_photo")}
             cursor={"pointer"}
           />
           <Box>
@@ -132,8 +173,20 @@ const Profile = () => {
             <Box>
               <Flex gap={"2rem"} marginLeft={"2rem"}>
                 <Text fontSize="2xl">{myPhotos.length} Posts</Text>
-                <Text fontSize="2xl">{myFollowing.length} Following</Text>
-                <Text fontSize="2xl">{myFollowers.length} Followers</Text>
+                <Text
+                  fontSize="2xl"
+                  onClick={() => modalHandler("following")}
+                  cursor={"pointer"}
+                >
+                  {myFollowing.length} Following
+                </Text>
+                <Text
+                  fontSize="2xl"
+                  onClick={() => modalHandler("followers")}
+                  cursor={"pointer"}
+                >
+                  {myFollowers.length} Followers
+                </Text>
               </Flex>
             </Box>
           </Box>
@@ -149,7 +202,7 @@ const Profile = () => {
         >
           {myPhotos.map((item, key) => {
             return (
-              <Image src={item.photo} w={"30%"} key={key}/>
+              <Image src={item.photo} w={"30%"} key={key} />
               // <>
               //   <button onClick={() => deletePost(item._id, item.postedBy)}>
               //     Delete
@@ -165,18 +218,78 @@ const Profile = () => {
       <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Change Profile Photo</ModalHeader>
+          <ModalHeader>{modalHeaderText}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <input type="file" name="" id="" onChange={(e)=>setProfilePicState(e.target.files[0])}/>
+            {/* If you have triggered Change Profile Photo  */}
+            {/* Self-invoking javascript function is used here that renders dynamic content on the modal box */}
+            {(function () {
+              switch (modalHeaderText) {
+                case "Change Profile Photo":
+                  return (
+                    <input
+                      type="file"
+                      name=""
+                      id=""
+                      onChange={(e) => setProfilePicState(e.target.files[0])}
+                    />
+                  );
+
+                case "Following":
+                  return (
+                    <List spacing={3} marginTop={"2"} marginBottom={"2"}>
+                      {myFollowingDetails.map((item, key) => {
+                        return (
+                          <ListItem key={key}>
+                            <Flex gap={"0 1rem"}>
+                              <Image
+                                src={item.profilePhoto}
+                                w={"30px"}
+                                borderRadius={"50%"}
+                              />
+                              <Text>{item.username}</Text>
+                            </Flex>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  );
+
+                case "Followers":
+                  return (
+                    <List spacing={3} marginTop={"2"} marginBottom={"2"}>
+                      {myFollowersDetails.map((item, key) => {
+                        return (
+                          <ListItem key={key}>
+                            <Flex gap={"0 1rem"}>
+                              <Image
+                                src={item.profilePhoto}
+                                w={"30px"}
+                                borderRadius={"50%"}
+                              />
+                              <Text>{item.username}</Text>
+                            </Flex>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  );
+              }
+            })()}
           </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button colorScheme="green" onClick={changeProfilePhoto}>Update</Button>
-          </ModalFooter>
+          {modalHeaderText === "Change Profile Photo" ? (
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button colorScheme="green" onClick={changeProfilePhoto}>
+                Update
+              </Button>
+            </ModalFooter>
+          ) : (
+            <></>
+          )}
         </ModalContent>
       </Modal>
     </>
