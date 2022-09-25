@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import "./Home.css";
-import imageFile from "./Image.png";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
+import { Box, Button, Flex, Image, Spacer, Text } from "@chakra-ui/react";
+import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 
 const Home = () => {
   const [feedData, setFeedData] = useState([]);
@@ -41,37 +44,59 @@ const Home = () => {
     axios.get("http://localhost:5050/feedposts", axiosConfig).then((res) => {
       setFeedData(res.data.posts.reverse());
     });
-  },[]);
+  }, []);
 
   return (
-    <div className="home">
-      <div className="card home-card">
-        {feedData.map((item, key) => {
-          return (
-            <>
-              {/* <h5>{item.postedBy.name}</h5> */}
-              <div className="card-image">
-                <Link to={`/profile/${item.postedBy._id}`}>{item.postedBy.name}</Link>
-                <img src={item.photo} alt="image" />
-              </div>
-              <div className="card-content">
-                {item.likes.length} Likes
-                <button className="like-btn" onClick={() => likePost(item._id)}>
-                  Like
-                </button>
-                <button
-                  className="unlike-btn"
-                  onClick={() => unLikePost(item._id)}
+    <>
+      <Navbar className="home"/>
+        <Flex className="card home-card" flexFlow={"column"} gap={"0.6rem"}>
+          {feedData.map((item, key) => {
+            return (
+                <Box
+                  className="card"
+                  w={"32vw"}
+                  border={"2px solid #efefef"}
+                  borderRadius={"1.5%"}
+                  key={key}
                 >
-                  Unlike
-                </button>
-                <p>{item.captions}</p>
-              </div>
-            </>
-          );
-        })}
-      </div>
-    </div>
+                  <Flex padding={"0.5rem 0.8rem"}>
+                    <Link to={`/profile/${item.postedBy._id}`}>
+                      {" "}
+                      <Image
+                        src={item.postedBy.profilePhoto}
+                        w={"1.5rem"}
+                        borderRadius={"50%"}
+                        marginRight={"1em"}
+                      />
+                    </Link>
+                    <Link to={`/profile/${item.postedBy._id}`}>
+                      <Text>{item.postedBy.name}</Text>
+                    </Link>
+                  </Flex>
+
+                  <Image src={item.photo} />
+                  <Box padding={"0.2rem 0.8rem"}>
+                    <Text>{item.captions}</Text>
+                    <Flex>
+                      <Text>{item.likes.length} Likes</Text>
+                      <Flex margin={"0.3rem 1rem"}>
+                        <FiHeart
+                          onClick={() => likePost(item._id)}
+                          cursor={"pointer"}
+                        />
+                        <FaHeart
+                          onClick={() => unLikePost(item._id)}
+                          cursor={"pointer"}
+                          color={"red"}
+                        />
+                      </Flex>
+                    </Flex>
+                  </Box>
+                </Box>
+            );
+          })}
+        </Flex>
+    </>
   );
 };
 

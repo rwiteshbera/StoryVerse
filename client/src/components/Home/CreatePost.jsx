@@ -2,15 +2,18 @@ import React from "react";
 import { useState } from "react";
 import "./CreatePost.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
+  let navigate = useNavigate();
+
   const [captions, setCaptions] = useState("");
   const [image, setImage] = useState();
   const [url, setUrl] = useState("");
   let token = localStorage.getItem("token");
 
-
   const Upload = async () => {
+
     const data = new FormData();
     data.append("file", image);
     data.append("upload_preset", "social_media_cloudinary");
@@ -19,7 +22,7 @@ const CreatePost = () => {
     const axiosConfig = {
       headers: {
         "Content-type": "application/json",
-        "Authorization": token
+        Authorization: token,
       },
     };
 
@@ -31,18 +34,22 @@ const CreatePost = () => {
 
       setUrl(imageInfo.data.secure_url);
 
-      const  info  = await axios.post(
-        "http://localhost:5050/upload",
-        { captions, url },
-        axiosConfig
-      );
+      try {
+        const info = await axios.post(
+          "http://localhost:5050/upload",
+          { captions, url },
+          axiosConfig
+        );
 
-      console.log("SUCCESS");
+        navigate("/profile")
+      } catch (e) {
+        console.log(e);
+      }
     } catch (error) {
       console.log(error);
     }
   };
-  
+
   return (
     <>
       <div className="card input-filled">

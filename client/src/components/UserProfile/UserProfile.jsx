@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import "./UserProfile.css";
+import Navbar from "../Navbar/Navbar";
 
 // import ProfilePic from "./profile.jpg";
 
@@ -68,10 +69,11 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserImage();
-  });
+  },[]);
 
   return (
     <>
+    <Navbar/>
       <div>
         <div style={{ display: "flex" }}>
           <img

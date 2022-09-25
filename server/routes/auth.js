@@ -15,8 +15,8 @@ router.get("/", (req, res) => {
 router.post("/signup", (req, res) => {
   try {
     // Check where the user has filled all the required fields
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    const { name, username, email, password } = req.body;
+    if (!name || !username || !email || !password) {
       return res.status(422).json({ error: "Please fill all the fields" });
     }
 
@@ -38,6 +38,7 @@ router.post("/signup", (req, res) => {
               email: email,
               password: hashedPassword,
               name: name,
+              username: username
             });
 
             newUser

@@ -1,3 +1,9 @@
-nav a {
-    color: black !important;
+#search_bar {
+    width: 35vw;
+}
+
+li {
+    list-style: none;
+    padding: 0.4px 0.6px;
+    margin: 0 0.6rem;
 }

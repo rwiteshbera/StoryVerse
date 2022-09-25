@@ -7,7 +7,7 @@ const requireLogin = require("../middleware/requireLogin");
 // Get the posts of the users you follow
 router.get("/feedPosts", requireLogin, (req, res) => {
   Post.find({ postedBy: { $in : req.user.following}})
-    .populate("postedBy", "name email")
+    .populate("postedBy", "name email profilePhoto")
     .then((posts) => {
       res.json({ posts: posts });
     })
@@ -47,8 +47,7 @@ router.post("/upload", requireLogin, (req, res) => {
 router.get("/mypost", requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
     .then((myposts) => {
-      // console.log(myposts);
-      // return res.json(myposts);
+      return res.json(myposts);
     })
     .catch((err) => {
       console.log(err);
@@ -97,7 +96,6 @@ router.put("/unlike", requireLogin, (req, res) => {
 // delete your own post
 router.delete("/delete/:postId", requireLogin, (req, res) => {
   try {
-    console.log(req.params.postId)
     const result = Post.findOne({_id: req.params.postId})
     .populate("postedBy", "_id")
     .exec((err, post)=> {
@@ -106,7 +104,7 @@ router.delete("/delete/:postId", requireLogin, (req, res) => {
       }
       post.remove()
       .then((result)=> {
-        console.log(result)
+        return res.json(result)
       })
       .catch((error)=> {
         console.log(error)

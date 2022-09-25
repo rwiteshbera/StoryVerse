@@ -108,6 +108,7 @@ router.post("/search", (req, res) => {
     let pattern = new RegExp("^" + req.body.query, "i");
 
     User.find({name: {$regex:pattern}})
+    .select("-password")
     .then((user) => {
       return res.json({user});
     })

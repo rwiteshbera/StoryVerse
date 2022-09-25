@@ -1,9 +1,30 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 import "./Profile.css";
+import {
+  Box,
+  Center,
+  Flex,
+  Image,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button 
+} from "@chakra-ui/react";
 
 const Profile = () => {
+  let navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [myName, setMyName] = useState();
   const [myProfilePhoto, setMyProfilePhoto] = useState();
   const [profilePicState, setProfilePicState] = useState();
@@ -27,30 +48,30 @@ const Profile = () => {
       "http://localhost:5050/mypost",
       axiosConfig
     );
-    setMyPhotos(data);
-    console.log(data);
+    setMyPhotos(data.reverse());
   };
 
   const fetchUserData = async () => {
-    try{
+    try {
       const { data } = await axios.get("http://localhost:5050/me", axiosConfig);
-    setMyName(data.name);
-    setMyFollowing(data.following);
-    setMyFollowers(data.followers);
-    setMyProfilePhoto(data.profilePhoto);
-    } catch(e) {
+      setMyName(data.name);
+      setMyFollowing(data.following);
+      setMyFollowers(data.followers);
+      setMyProfilePhoto(data.profilePhoto);
+    } catch (e) {
       console.log(e);
     } finally {
       // console.log(myProfilePhoto)
     }
   };
 
-  const deletePost = (postId, userId) => {
+  const deletePost = async (postId, userId) => {
     if (userId === localStorage.getItem("id")) {
-      axios
-        .delete(`http://localhost:5050/delete/${postId}`, axiosConfig)
-        .then((res) => console.log(res))
-        .catch((e) => console.log(e));
+      const res = await axios.delete(
+        `http://localhost:5050/delete/${postId}`,
+        axiosConfig
+      );
+      console.log("Deleted");
     } else {
       console.log("Unable to delete the post!");
     }
@@ -74,7 +95,7 @@ const Profile = () => {
         "https://api.cloudinary.com/v1_1/dflvpcsin/image/upload",
         data
       );
-      
+
       const info = await axios.patch(
         "http://localhost:5050/change_profile_pic",
         { profilePicURL: imageInfo.data.secure_url },
@@ -82,56 +103,82 @@ const Profile = () => {
       );
 
       setMyProfilePhoto(imageInfo.data.secure_url);
-
     } catch (error) {
       console.log(error);
-    } 
+    }
   };
 
   useEffect(() => {
     fetchUserImage();
     fetchUserData();
-  }, [myProfilePhoto, myPhotos]); // Re-render when profile photo has been updated or uploaded new pics
+  }, [myProfilePhoto]); // Re-render when profile photo has been updated or uploaded new pics
 
   return (
     <>
-      <div>
-        <div style={{ display: "flex" }}>
-          <input
-            type="file"
-            onChange={(e) => setProfilePicState(e.target.files[0])}
-          />
-
-          <img
-            id="profile-image"
+      <Navbar />
+      <Center marginTop={"1rem"}>
+        <Flex>
+          <Image
             src={myProfilePhoto}
-            style={{ borderRadius: "50%", margin: "2rem 4rem" }}
-            onClick={changeProfilePhoto}
+            w={"10rem"}
+            borderRadius={"50%"}
+            onClick={onOpen}
+            cursor={"pointer"}
           />
-
-          <div>
-            <h4>{myName}</h4>
-            <div style={{ display: "flex", gap: "2rem" }}>
-              <h5>{myPhotos.length} Posts</h5>
-              <h5>{myFollowing.length} Following</h5>
-              <h5>{myFollowers.length} Followers</h5>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex" }} id="gallery">
+          <Box>
+            <Text fontSize="4xl" fontWeight={"bold"} margin={"0.2rem 2rem"}>
+              {myName}
+            </Text>
+            <Box>
+              <Flex gap={"2rem"} marginLeft={"2rem"}>
+                <Text fontSize="2xl">{myPhotos.length} Posts</Text>
+                <Text fontSize="2xl">{myFollowing.length} Following</Text>
+                <Text fontSize="2xl">{myFollowers.length} Followers</Text>
+              </Flex>
+            </Box>
+          </Box>
+        </Flex>
+      </Center>
+      <Center marginTop={"4rem"}>
+        <Flex
+          gap={"0.5rem"}
+          border={"2px solid #e4e6e7"}
+          flexWrap={"wrap"}
+          padding={"0.4rem"}
+          borderRadius="10px"
+        >
           {myPhotos.map((item, key) => {
             return (
-              <>
-                <button onClick={() => deletePost(item._id, item.postedBy)}>
-                  Delete
-                </button>
-                <img src={item.photo} key={item._id} />
-              </>
+              <Image src={item.photo} w={"30%"} key={key}/>
+              // <>
+              //   <button onClick={() => deletePost(item._id, item.postedBy)}>
+              //     Delete
+              //   </button>
+              //   <img src={item.photo} key={item._id} />
+              // </>
             );
           })}
-        </div>
-      </div>
+        </Flex>
+      </Center>
+
+      {/* Change Profile Photo  */}
+      <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Change Profile Photo</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <input type="file" name="" id="" onChange={(e)=>setProfilePicState(e.target.files[0])}/>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button colorScheme="green" onClick={changeProfilePhoto}>Update</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
