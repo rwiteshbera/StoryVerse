@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import "./Profile.css";
 import {
@@ -240,16 +240,18 @@ const Profile = () => {
                     <List spacing={3} marginTop={"2"} marginBottom={"2"}>
                       {myFollowingDetails.map((item, key) => {
                         return (
-                          <ListItem key={key}>
-                            <Flex gap={"0 1rem"}>
-                              <Image
-                                src={item.profilePhoto}
-                                w={"30px"}
-                                borderRadius={"50%"}
-                              />
-                              <Text>{item.username}</Text>
-                            </Flex>
-                          </ListItem>
+                          <Link to={`/profile/${item._id}`} key={key}>
+                            <ListItem>
+                              <Flex gap={"0 1rem"}>
+                                <Image
+                                  src={item.profilePhoto}
+                                  w={"30px"}
+                                  borderRadius={"50%"}
+                                />
+                                <Text>{item.username}</Text>
+                              </Flex>
+                            </ListItem>
+                          </Link>
                         );
                       })}
                     </List>

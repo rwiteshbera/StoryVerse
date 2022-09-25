@@ -3,6 +3,7 @@ import { useState } from "react";
 import "./CreatePost.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 
 const CreatePost = () => {
   let navigate = useNavigate();
@@ -13,7 +14,6 @@ const CreatePost = () => {
   let token = localStorage.getItem("token");
 
   const Upload = async () => {
-
     const data = new FormData();
     data.append("file", image);
     data.append("upload_preset", "social_media_cloudinary");
@@ -41,7 +41,7 @@ const CreatePost = () => {
           axiosConfig
         );
 
-        navigate("/profile")
+        navigate("/profile");
       } catch (e) {
         console.log(e);
       }
@@ -52,6 +52,7 @@ const CreatePost = () => {
 
   return (
     <>
+      <Navbar />
       <div className="card input-filled">
         <input
           type="text"
