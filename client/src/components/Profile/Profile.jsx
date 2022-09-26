@@ -41,6 +41,7 @@ const Profile = () => {
   const [modalHeaderText, setModalHeaderText] = useState();
 
   let token = localStorage.getItem("token");
+  let userid = localStorage.getItem("id");
 
   const axiosConfig = {
     headers: {
@@ -115,7 +116,7 @@ const Profile = () => {
 
   const getFollowing = async () => {
     const info = await axios.post(
-      "http://localhost:5050/get_following",
+      `http://localhost:5050/get_following`,
       { following: myFollowing },
       axiosConfig
     );
@@ -123,12 +124,18 @@ const Profile = () => {
   };
 
   const getFollowers = async () => {
-    const info = await axios.post(
-      "http://localhost:5050/get_followers",
-      { following: myFollowers },
-      axiosConfig
-    );
-    setMyFollowersDetails(info.data.users);
+    try {
+      const info = await axios.post(
+        `http://localhost:5050/get_followers`,
+        { followers: myFollowers },
+        axiosConfig
+      );
+      setMyFollowersDetails(info.data.users);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      console.log(myFollowersDetails);
+    }
   };
 
   const modalHandler = (e) => {
@@ -153,7 +160,6 @@ const Profile = () => {
     fetchUserImage();
     fetchUserData();
   }, [myProfilePhoto]); // Re-render when profile photo has been updated or uploaded new pics
-
   return (
     <>
       <Navbar />
@@ -192,7 +198,7 @@ const Profile = () => {
           </Box>
         </Flex>
       </Center>
-      <Center marginTop={"4rem"}>
+      <Center margin={"4rem 15%"}>
         <Flex
           gap={"0.5rem"}
           border={"2px solid #e4e6e7"}
@@ -262,16 +268,18 @@ const Profile = () => {
                     <List spacing={3} marginTop={"2"} marginBottom={"2"}>
                       {myFollowersDetails.map((item, key) => {
                         return (
-                          <ListItem key={key}>
-                            <Flex gap={"0 1rem"}>
-                              <Image
-                                src={item.profilePhoto}
-                                w={"30px"}
-                                borderRadius={"50%"}
-                              />
-                              <Text>{item.username}</Text>
-                            </Flex>
-                          </ListItem>
+                          <Link to={`/profile/${item._id}`} key={key}>
+                            <ListItem>
+                              <Flex gap={"0 1rem"}>
+                                <Image
+                                  src={item.profilePhoto}
+                                  w={"30px"}
+                                  borderRadius={"50%"}
+                                />
+                                <Text>{item.username}</Text>
+                              </Flex>
+                            </ListItem>
+                          </Link>
                         );
                       })}
                     </List>

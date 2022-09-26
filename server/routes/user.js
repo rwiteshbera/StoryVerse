@@ -49,60 +49,60 @@ router.get("/user/:id", requireLogin, (req, res) => {
 
 // Follow users
 router.put("/follow", requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.body.followId,
+    {
+      $addToSet: { followers: req.user._id },
+    },
+    { new: true }
+  ).exec((err, result) => {
+    if (err) {
+      return res.status(422).json({ error: err });
+    }
     User.findByIdAndUpdate(
-      req.body.followId,
+      req.user._id,
       {
-        $addToSet: { followers: req.user._id },
+        $addToSet: { following: req.body.followId },
       },
       { new: true }
-    ).exec((err, result) => {
-      if (err) {
+    )
+      .then((result) => {
+        const { password, ...rest } = result;
+        return res.json(rest._doc);
+      })
+      .catch((err) => {
         return res.status(422).json({ error: err });
-      }
-      User.findByIdAndUpdate(
-        req.user._id,
-        {
-          $addToSet: { following: req.body.followId },
-        },
-        { new: true }
-      )
-        .then((result) => {
-          const { password, ...rest } = result;
-          return res.json(rest._doc);
-        })
-        .catch((err) => {
-          return res.status(422).json({ error: err });
-        });
-    });
+      });
+  });
 });
 
 // Unfollow users
 router.put("/unfollow", requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.body.unfollowId,
+    {
+      $pull: { followers: req.user._id },
+    },
+    { new: true }
+  ).exec((err, result) => {
+    if (err) {
+      return res.status(422).json({ error: err });
+    }
     User.findByIdAndUpdate(
-      req.body.unfollowId,
+      req.user._id,
       {
-        $pull: { followers: req.user._id },
+        $pull: { following: req.body.unfollowId },
       },
       { new: true }
-    ).exec((err, result) => {
-      if (err) {
+    )
+      .then((result) => {
+        const { password, ...rest } = result;
+        return res.json(rest._doc);
+      })
+      .catch((err) => {
         return res.status(422).json({ error: err });
-      }
-      User.findByIdAndUpdate(
-        req.user._id,
-        {
-          $pull: { following: req.body.unfollowId },
-        },
-        { new: true }
-      )
-        .then((result) => {
-          const { password, ...rest } = result;
-          return res.json(rest._doc);
-        })
-        .catch((err) => {
-          return res.status(422).json({ error: err });
-        });
-    });
+      });
+  });
 });
 
 // search user
@@ -120,29 +120,28 @@ router.post("/search", (req, res) => {
     });
 });
 
-
 // Get following users list
-router.post("/get_following", requireLogin, (req,res) => {
-  User.find({ _id: req.body.following})
+router.post("/get_following", requireLogin, (req, res) => {
+  User.find({ _id: req.body.following })
     .select("-password") // Get all the fields except password
     .then((users) => {
-        res.json({ users});
+      res.json({ users });
     })
     .catch((err) => {
       return res.status(404).json({ error: "User not found." });
     });
-})
+});
 
 // Get followers list
-router.post("/get_followers", requireLogin, (req,res) => {
-  User.find({ _id: req.body.followers})
+router.post("/get_followers", requireLogin, (req, res) => {
+  User.find({ _id: req.body.followers })
     .select("-password") // Get all the fields except password
     .then((users) => {
-        res.json({ users});
+      res.json({ users });
     })
     .catch((err) => {
       return res.status(404).json({ error: "User not found." });
     });
-})
+});
 
 module.exports = router;
