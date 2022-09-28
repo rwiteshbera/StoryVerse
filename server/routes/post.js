@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const requireLogin = require("../middleware/requireLogin");
 
-// Get the posts of the users you follow
+// Get the posts of the users you follow in homepage
 router.get("/feedPosts", requireLogin, (req, res) => {
   Post.find({ postedBy: { $in : req.user.following}})
     .populate("postedBy", "name email profilePhoto")
@@ -43,7 +43,7 @@ router.post("/upload", requireLogin, (req, res) => {
 });
 
 
-// All the post created by that user
+// All the post created by the logged-in user
 router.get("/mypost", requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
     .then((myposts) => {

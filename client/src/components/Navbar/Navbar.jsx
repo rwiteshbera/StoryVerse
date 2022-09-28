@@ -17,7 +17,14 @@ import {
   List,
   ListItem,
   Image,
-  Text
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuGroup,
+  MenuItem,
+  Button,
+  MenuDivider,
 } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -86,20 +93,35 @@ const Navbar = () => {
                 <AiOutlineHome fontSize={"1.5rem"} />
               </Link>
             </li>
-            <li onClick={logOut}>
-              <Link to="/login">
-                <RiLogoutCircleRLine fontSize={"1.5rem"} />
-              </Link>
-            </li>
             <li>
               <Link to="/create">
                 <BsPlusCircle fontSize={"1.5rem"} />
               </Link>
             </li>
             <li>
-              <Link to="/profile">
-                <CgProfile fontSize={"1.5rem"} />
-              </Link>
+              <Menu>
+                <MenuButton>
+                  <CgProfile fontSize={"1.5rem"} />
+                </MenuButton>
+                <MenuList>
+                  <MenuGroup title="Profile">
+                    <Link to="/profile">
+                      <MenuItem>My Account</MenuItem>
+                    </Link>
+                    <Link to="/settings">
+                      <MenuItem>Settings</MenuItem>
+                    </Link>
+                    <Link to="/login">
+                      <MenuItem onClick={logOut}>Logout</MenuItem>
+                    </Link>
+                  </MenuGroup>
+                  <MenuDivider />
+                  <MenuGroup title="Help">
+                    <MenuItem>Docs</MenuItem>
+                    <MenuItem>FAQ</MenuItem>
+                  </MenuGroup>
+                </MenuList>
+              </Menu>
             </li>
           </Flex>
         </Flex>
@@ -120,7 +142,20 @@ const Navbar = () => {
 
             <List spacing={3} marginTop={"2"} marginBottom={"2"}>
               {SearchResult.map((item, key) => {
-                return <Link to={`/profile/${item._id}`} key={key}><ListItem ><Flex gap={"0 1rem"}><Image src={item.profilePhoto} w={"30px"} borderRadius={"50%"}/><Text>{item.username}</Text></Flex></ListItem></Link>;
+                return (
+                  <Link to={`/profile/${item._id}`} key={key}>
+                    <ListItem>
+                      <Flex gap={"0 1rem"}>
+                        <Image
+                          src={item.profilePhoto}
+                          w={"30px"}
+                          borderRadius={"50%"}
+                        />
+                        <Text>{item.username}</Text>
+                      </Flex>
+                    </ListItem>
+                  </Link>
+                );
               })}
             </List>
           </ModalBody>

@@ -62,7 +62,7 @@ router.post("/signup", (req, res) => {
   }
 });
 
-// Signin process
+// Signin process // Login Process
 router.post("/signin", (req, res) => {
   // Check where the user has filled all the required fields
   const { email, password } = req.body;

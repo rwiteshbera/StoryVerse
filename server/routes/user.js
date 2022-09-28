@@ -5,13 +5,13 @@ const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 const requireLogin = require("../middleware/requireLogin");
 
-// fetch logged in user data
+// fetch logged-in user data
 router.get("/me", requireLogin, (req, res) => {
   const { name, followers, following, profilePhoto } = req.user;
   return res.json({ name, followers, following, profilePhoto });
 });
 
-// Change Profile Photo
+// Change your profile Photo
 router.patch("/change_profile_pic", requireLogin, (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,

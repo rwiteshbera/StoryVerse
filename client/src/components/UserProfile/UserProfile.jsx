@@ -235,7 +235,7 @@ const Profile = () => {
                       {myFollowingDetails.map((item, key) => {
                         return (
                           <Link to={`/profile/${item._id}`} key={key}>
-                            <ListItem>
+                            <ListItem marginBottom={"0.5rem"}>
                               <Flex gap={"0 1rem"}>
                                 <Image
                                   src={item.profilePhoto}
@@ -257,7 +257,7 @@ const Profile = () => {
                       {myFollowersDetails.map((item, key) => {
                         return (
                           <Link to={`/profile/${item._id} `} key={key}>
-                            <ListItem>
+                            <ListItem marginBottom={"0.5rem"}>
                               <Flex gap={"0 1rem"}>
                                 <Image
                                   src={item.profilePhoto}
