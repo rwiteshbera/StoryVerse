@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "https://res.cloudinary.com/dflvpcsin/image/upload/v1662910341/DefaultProfilePhoto/blank-profile-picture-973460_1280_veumtr.png"
     },
+    gender: {
+        type: String,
+        default: "Prefer not to say"
+    },
     following: [{type: ObjectId, ref: "User"}],
     followers: [{type: ObjectId, ref: "User"}],
 })

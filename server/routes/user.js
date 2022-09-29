@@ -7,8 +7,18 @@ const requireLogin = require("../middleware/requireLogin");
 
 // fetch logged-in user data
 router.get("/me", requireLogin, (req, res) => {
-  const { name, followers, following, profilePhoto } = req.user;
-  return res.json({ name, followers, following, profilePhoto });
+  const { _id, name, username, email, gender, followers, following, profilePhoto } =
+    req.user;
+  return res.json({
+    _id,
+    name,
+    username,
+    email,
+    gender,
+    followers,
+    following,
+    profilePhoto,
+  });
 });
 
 // Change your profile Photo

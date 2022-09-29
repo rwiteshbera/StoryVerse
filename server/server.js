@@ -30,6 +30,7 @@ app.use(express.json());
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
 app.use(require("./routes/user"));
+app.use(require("./routes/settings"))
 
 app.listen(PORT, () => {
   console.log(`Server is listening at: http://localhost:${PORT}/`);

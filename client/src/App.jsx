@@ -34,7 +34,7 @@ const App = () => {
         <Route exact path="/profile" element={<Profile />}></Route>
         <Route exact path="/profile/:userid" element={<UserProfile />}></Route>
         <Route exact path="/settings" element={<Settings />}>
-          <Route path="/settings/edit" element={<EditProfile />} />
+          <Route path="/settings" element={<EditProfile />} />
           <Route path="/settings/privacy&security" element={<PrivacySecurity/>}/>
           <Route path="/settings/login&activity" element={<LoginActivity/>}/>
           <Route path="/settings/account&management" element={<ManageAccount/>}/>

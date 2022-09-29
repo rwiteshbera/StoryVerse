@@ -25,7 +25,7 @@ const Settings = () => {
         <GridItem colSpan={2} rowSpan={3}>
           <Center>
             <List>
-              <Link to="/settings/edit">
+              <Link to="/settings">
                 <ListItem margin={"3rem 0rem"} cursor={"pointer"}>
                   Edit Profile
                 </ListItem>
