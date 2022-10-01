@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
@@ -91,11 +92,49 @@ router.post("/settings/edit&profile/email", requireLogin, (req, res) => {
   }
 });
 
-
-
 // Change password
-router.post('/settings/privacy&security/password', requireLogin, (req, res) => {
-  return res.json({message: "SUCCESS"})
-})
+router.post("/settings/privacy&security/password", requireLogin, (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    return res.status(402).json({ message: "Field cannot be empty." });
+  } else {
+    // Old password and new password should not be same
+    if (oldPassword !== newPassword) {
+      bcrypt
+        .compare(oldPassword, req.user.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            // If you have provided correct old password, then only you can add new password
+            bcrypt.hash(newPassword, 16).then((hashedPassword) => {
+              User.findByIdAndUpdate(
+                req.user._id,
+                { password: hashedPassword },
+                { new: true },
+                (err, result) => {
+                  if (err) {
+                    return res.status(422).json({ error: err });
+                  } else {
+                    return res.json({ message: "Password updated successfully." });
+                  }
+                }
+              );
+            });
+          } else {
+            return res.json({ message: "Wrong old password" });
+          }
+        })
+        .catch((e) => {
+          return console.log(e);
+        });
+    } else {
+      return res
+        .status(402)
+        .json({
+          message: "Old password should not be same with new password.",
+        });
+    }
+  }
+});
 
 module.exports = router;

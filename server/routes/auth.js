@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const uaParser = require('ua-parser-js');
 const { JWT_SECRET_KEY } = require("../keys");
 const requireLogin = require("../middleware/requireLogin");
 
@@ -38,7 +39,7 @@ router.post("/signup", (req, res) => {
               email: email,
               password: hashedPassword,
               name: name,
-              username: username
+              username: username,
             });
 
             newUser
@@ -70,26 +71,37 @@ router.post("/signin", (req, res) => {
     return res.status(422).json({ error: "Please fill all the fields" });
   }
 
-  User.findOne({ email: email }).then((savedUser) => {
-    if (!savedUser) {
-      return res.status(422).json({ error: "Invalid email or password" });
-    }
+  User.findOne({ email: email })
+    .then((savedUser) => {
+      if (!savedUser) {
+        return res.status(422).json({ error: "Invalid email" });
+      }
 
-    bcrypt
-      .compare(password, savedUser.password)
-      .then((doMatch) => {
-        if (doMatch) {
-          const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET_KEY);
-          const {name, _id, following, followers} = savedUser;
-          res.json({ token: token, name:name, userId: _id, following: following.length, followers: followers.length});
-        } else {
-          return res.status(422).json({ error: "Invalid email or password" });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  });
+      bcrypt
+        .compare(password, savedUser.password)
+        .then((doMatch) => {
+          if (doMatch) {
+            const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET_KEY);
+            const { name, _id, following, followers } = savedUser;
+            res.json({
+              token: token,
+              name: name,
+              userId: _id,
+              following: following.length,
+              followers: followers.length,
+              user_agent: uaParser(req.headers['sec-ch-ua'])
+            });
+          } else {
+            return res.status(422).json({ error: "Invalid password" });
+          }
+        })
+        .catch((err) => {
+          return res.status(422).json({ error: err });
+        });
+    })
+    .catch((err) => {
+      return res.status(422).json({ error: err });
+    });
 });
 
 // Protected content

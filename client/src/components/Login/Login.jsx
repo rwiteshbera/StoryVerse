@@ -20,40 +20,41 @@ const Login = () => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
 
-  // Login user 
+  const axiosConfig = {
+    headers: {
+      "Content-type": "application/json",
+    },
+  };
+
+  // Login user
   const LoginUser = async () => {
-    try {
-      if (!email || !password) {
-        return;
+    if (!email || !password) {
+      return;
+    } else {
+      try {
+        const { data } = await axios.post(
+          "http://localhost:5050/signin",
+          { email, password },
+          axiosConfig
+        );
+        console.log("Logged in successfully!");
+        localStorage.setItem("token", `Bearer ${data.token}`);
+        localStorage.setItem("user", `${data.name}`);
+        localStorage.setItem("id", `${data.userId}`);
+        localStorage.setItem("user_agent", JSON.stringify(data.user_agent))
+        navigate("/");
+
+        Notification.requestPermission().then((perm) => {
+          if (perm === "granted") {
+            new Notification("Logged in");
+          }
+        });
+      } catch (err) {
+        console.log("ERROR" + err);
+      } finally {
+        setEmail("");
+        setPassword("");
       }
-      const axiosConfig = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-
-      const { data } = await axios.post(
-        "http://localhost:5050/signin",
-        { email, password },
-        axiosConfig
-      );
-      console.log("Logged in successfully!");
-      localStorage.setItem("token", `Bearer ${data.token}`);
-      localStorage.setItem("user", `${data.name}`);
-      localStorage.setItem("id", `${data.userId}`);
-
-      navigate("/");
-
-      Notification.requestPermission().then((perm) => {
-        if (perm === "granted") {
-          new Notification("Logged in");
-        }
-      });
-    } catch (error) {
-      console.log("ERROR" + error);
-    } finally {
-      setEmail("");
-      setPassword("");
     }
   };
 
@@ -63,11 +64,6 @@ const Login = () => {
       if (!name || !username || !email || !password) {
         return;
       }
-      const axiosConfig = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
 
       const { data } = await axios.post(
         "http://localhost:5050/signup",
