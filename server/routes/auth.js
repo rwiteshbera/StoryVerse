@@ -4,8 +4,14 @@ const mongoose = require("mongoose");
 const User = mongoose.model("User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const uaParser = require('ua-parser-js');
-const { JWT_SECRET_KEY } = require("../keys");
+const uaParser = require("ua-parser-js");
+const nodemailer = require("nodemailer");
+const {
+  JWT_SECRET_KEY,
+  SENDER_EMAIL_PASS,
+  SENDER_EMAIL,
+  PORT_ID,
+} = require("../keys");
 const requireLogin = require("../middleware/requireLogin");
 
 router.get("/", (req, res) => {
@@ -89,7 +95,7 @@ router.post("/signin", (req, res) => {
               userId: _id,
               following: following.length,
               followers: followers.length,
-              user_agent: uaParser(req.headers['sec-ch-ua'])
+              user_agent: uaParser(req.headers["sec-ch-ua"]),
             });
           } else {
             return res.status(422).json({ error: "Invalid password" });
@@ -101,6 +107,122 @@ router.post("/signin", (req, res) => {
     })
     .catch((err) => {
       return res.status(422).json({ error: err });
+    });
+});
+
+// Reset Password // Send a special Link to email
+router.post("/reset_password", (req, res) => {
+  const { email } = req.body;
+
+  User.findOne({ email: email })
+    .then((savedUser) => {
+      if (!savedUser) {
+        return res.json("Email is not registered yet.");
+      }
+
+      const secret = JWT_SECRET_KEY + savedUser.password;
+
+      const payload = {
+        email: email,
+        id: savedUser._id,
+      };
+
+      const token = jwt.sign(payload, secret, { expiresIn: "15m" }); // Special link will be expired after 15 min
+
+      // This is the special link that will be used to reset user password
+      const special_link = `http://localhost:${PORT_ID}/reset_password/${savedUser._id}/${token}`;
+
+      const message = {
+        from: SENDER_EMAIL,
+        to: email,
+        subject: "Reset your password",
+        text: `Reset Link (Valid for 15 minutes): ${special_link}`,
+      };
+
+      nodemailer
+        .createTransport({
+          service: "gmail",
+          auth: {
+            user: SENDER_EMAIL,
+            pass: SENDER_EMAIL_PASS,
+          },
+          port: 465,
+          host: "smtp.gmail.com",
+        })
+        .sendMail(message, (err) => {
+          if (err) {
+            return res.json(err);
+          } else {
+            return res.json("Password reset link has been sent to your email.");
+          }
+        });
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
+    });
+});
+
+// Redirect to reset password page after reset link validation
+router.get("/reset_password/:id/:token", (req, res) => {
+  let { id, token } = req.params;
+
+  // Check id whether it exists or not
+  // Link validation
+  // Dot(.) and Hyphen(-) will not work in browser address path, hence we are replacing it with underscore(_dot_) and (_hyp_).
+  token = token.replaceAll(".", "_dot_").replaceAll("-", "_hyp_");
+
+  User.findOne({ _id: id })
+    .select("-password")
+    .then((savedUser) => {
+      return res
+        .status(301)
+        .redirect(`http://localhost:3000/reset_password/${id}/${token}`);
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
+    });
+});
+
+// If user click on reset button after giving new password
+router.post("/reset_password/:id/:token", (req, res) => {
+  let { id, token } = req.params;
+  let { newPassword } = req.body;
+  // Check id whether it exists or not
+  // Link validation
+  // Dot(.) and Hyphen(-) will not work in browser address path, hence we are replacing it with underscore(_dot_) and (_hyp_).
+  token = token.replaceAll("_dot_", ".").replaceAll("_hyp_", "-");
+
+  User.findOne({ _id: id })
+    .then((savedUser) => {
+      if (!savedUser) {
+        return res.json("Invalid reset link");
+      }
+      const secret = JWT_SECRET_KEY + savedUser.password;
+  
+      try {
+        const payload = jwt.verify(token, secret);
+        // return res.json({payload: payload})
+
+        bcrypt.hash(newPassword, 16).then((hashedPassword) => {
+          User.findByIdAndUpdate(
+            payload.id,
+            { password: hashedPassword },
+            { new: true },
+            (err, result) => {
+              if (err) {
+                return res.status(422).json({ error: err });
+              } else {
+                return res.json({ message: "Password updated successfully." });
+              }
+            }
+          );
+        });
+      } catch (e) {
+        return res.status(422).json({ error: e });
+      }
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
     });
 });
 

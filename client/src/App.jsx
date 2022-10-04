@@ -12,6 +12,8 @@ import EditProfile from "./settings/utility/EditProfile";
 import PrivacySecurity from "./settings/utility/PrivacySecurity";
 import LoginActivity from "./settings/utility/LoginActivity"
 import ManageAccount from "./settings/utility/ManageAccount"
+import ForgetPassword from "./components/Login/ForgetPassword/ForgetPassword";
+import ResetPassword from "./components/Login/ResetPassword/ResetPassword";
 
 const App = () => {
   const navigate = useNavigate();
@@ -39,6 +41,8 @@ const App = () => {
           <Route path="/settings/login&activity" element={<LoginActivity/>}/>
           <Route path="/settings/account&management" element={<ManageAccount/>}/>
         </Route>
+        <Route exact path="/forget_password" element={<ForgetPassword/>}/>
+        <Route path="/reset_password/:id/:token" element={<ResetPassword/>}/>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </>

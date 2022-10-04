@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
 import { GrMail } from "react-icons/gr";
+import {Text} from "@chakra-ui/react"
 
 import Social_Bio from "./images/social_bio.svg";
 import Social_Share from "./images/social_share.svg";
@@ -106,6 +107,7 @@ const Login = () => {
       <div className={signUpMode ? "container sign-up-mode" : "container"}>
         <div className="forms-container">
           <div className="login-signup">
+
             {/* Login */}
             <div className="log-in-form">
               <h2 className="title">Login</h2>
@@ -130,6 +132,7 @@ const Login = () => {
               <button onClick={LoginUser} className="btn login">
                 Login
               </button>
+              <Link to="/forget_password"><Text color="black" cursor="pointer" textDecoration="underline">Forget Password</Text></Link>
             </div>
 
             {/* Signup  */}
