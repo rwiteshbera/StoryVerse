@@ -235,9 +235,5 @@ router.post("/reset_password/:id/:token", (req, res) => {
     });
 });
 
-// Protected content
-router.get("/protected", requireLogin, (req, res) => {
-  res.send("Hello User from Protected");
-});
 
 module.exports = router;

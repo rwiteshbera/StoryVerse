@@ -22,14 +22,15 @@ const App = () => {
   useEffect(() => {
     const user = localStorage.getItem("user");
 
-    if (
-      // If user is not loggedin, then redirect to login page
-      // If user want to go to reset password or forget password page, by default he is not logged in, hence don't redirect to login
-      !user &&
-      !location.pathname.startsWith("/reset_password") &&
-      !location.pathname === "/forget_password"
-    ) {
+    // If user is not loggedin, then redirect to login page
+    // If user want to go to reset password or forget password page, by default he is not logged in, hence don't redirect to login
+
+    if (!user && location.pathname === "/forget_password") {
+      navigate("/forget_password");
+    } else if (!user && !location.pathname.startsWith("/reset_password")) {
       navigate("/login");
+    } else if (!user && location.pathname.startsWith("/reset_password")) {
+      // Do nothing
     }
   }, []);
 
