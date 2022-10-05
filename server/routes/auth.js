@@ -169,14 +169,23 @@ router.get("/reset_password/:id/:token", (req, res) => {
   // Check id whether it exists or not
   // Link validation
   // Dot(.) and Hyphen(-) will not work in browser address path, hence we are replacing it with underscore(_dot_) and (_hyp_).
-  token = token.replaceAll(".", "_dot_").replaceAll("-", "_hyp_");
 
   User.findOne({ _id: id })
-    .select("-password")
     .then((savedUser) => {
-      return res
-        .status(301)
-        .redirect(`http://localhost:3000/reset_password/${id}/${token}`);
+      if (!savedUser) {
+        return res.send("User not found");
+      }
+      const secret = JWT_SECRET_KEY + savedUser.password;
+
+      try {
+        const payload = jwt.verify(token, secret);
+        token = token.replaceAll(".", "_dot_").replaceAll("-", "_hyp_");
+        return res
+          .status(301)
+          .redirect(`http://localhost:3000/reset_password/${id}/${token}`);
+      } catch (error) {
+        return res.send("Invalid link");
+      }
     })
     .catch((e) => {
       return res.status(422).json({ error: e });
@@ -198,7 +207,7 @@ router.post("/reset_password/:id/:token", (req, res) => {
         return res.json("Invalid reset link");
       }
       const secret = JWT_SECRET_KEY + savedUser.password;
-  
+
       try {
         const payload = jwt.verify(token, secret);
         // return res.json({payload: payload})
@@ -218,7 +227,7 @@ router.post("/reset_password/:id/:token", (req, res) => {
           );
         });
       } catch (e) {
-        return res.status(422).json({ error: e });
+        return res.send("Invalid link");
       }
     })
     .catch((e) => {

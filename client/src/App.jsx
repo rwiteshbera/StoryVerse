@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Home from "./components/Home/Home";
 import Login from "./components/Login/Login";
 import Profile from "./components/Profile/Profile";
@@ -10,19 +10,25 @@ import Settings from "./settings/Settings";
 
 import EditProfile from "./settings/utility/EditProfile";
 import PrivacySecurity from "./settings/utility/PrivacySecurity";
-import LoginActivity from "./settings/utility/LoginActivity"
-import ManageAccount from "./settings/utility/ManageAccount"
+import LoginActivity from "./settings/utility/LoginActivity";
+import ManageAccount from "./settings/utility/ManageAccount";
 import ForgetPassword from "./components/Login/ForgetPassword/ForgetPassword";
 import ResetPassword from "./components/Login/ResetPassword/ResetPassword";
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    if (user) {
-      // navigate('/');
-    } else {
+
+    if (
+      // If user is not loggedin, then redirect to login page
+      // If user want to go to reset password or forget password page, by default he is not logged in, hence don't redirect to login
+      !user &&
+      !location.pathname.startsWith("/reset_password") &&
+      !location.pathname === "/forget_password"
+    ) {
       navigate("/login");
     }
   }, []);
@@ -37,12 +43,22 @@ const App = () => {
         <Route exact path="/profile/:userid" element={<UserProfile />}></Route>
         <Route exact path="/settings" element={<Settings />}>
           <Route path="/settings" element={<EditProfile />} />
-          <Route path="/settings/privacy&security" element={<PrivacySecurity/>}/>
-          <Route path="/settings/login&activity" element={<LoginActivity/>}/>
-          <Route path="/settings/account&management" element={<ManageAccount/>}/>
+          <Route
+            path="/settings/privacy&security"
+            element={<PrivacySecurity />}
+          />
+          <Route path="/settings/login&activity" element={<LoginActivity />} />
+          <Route
+            path="/settings/account&management"
+            element={<ManageAccount />}
+          />
         </Route>
-        <Route exact path="/forget_password" element={<ForgetPassword/>}/>
-        <Route path="/reset_password/:id/:token" element={<ResetPassword/>}/>
+        <Route exact path="/forget_password" element={<ForgetPassword />} />
+        <Route
+          exact
+          path="/reset_password/:id/:token"
+          element={<ResetPassword />}
+        />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </>
