@@ -88,15 +88,32 @@ router.post("/signin", (req, res) => {
         .then((doMatch) => {
           if (doMatch) {
             const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET_KEY);
-            const { name, _id, following, followers } = savedUser;
-            res.json({
-              token: token,
-              name: name,
-              userId: _id,
-              following: following.length,
-              followers: followers.length,
-              user_agent: uaParser(req.headers["sec-ch-ua"]),
+
+            // Save Loggedin activity
+            User.findByIdAndUpdate(
+              savedUser._id,
+              {
+                // Saving user device os type
+                $push: { loggedInActivity: uaParser(req.headers["sec-ch-ua-platform"]).ua },
+              },
+              {
+                new: true,
+              }
+            ).exec((err, result) => {
+              if (err) {
+                return res.status(422).json({ error: err });
+              } else {
+                const { name, _id, following, followers } = savedUser;
+                res.json({
+                  token: token,
+                  name: name,
+                  userId: _id,
+                  following: following.length,
+                  followers: followers.length,
+                });
+              }
             });
+
           } else {
             return res.status(422).json({ error: "Invalid password" });
           }
@@ -234,6 +251,5 @@ router.post("/reset_password/:id/:token", (req, res) => {
       return res.status(422).json({ error: e });
     });
 });
-
 
 module.exports = router;

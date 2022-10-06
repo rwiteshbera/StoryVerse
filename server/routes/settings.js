@@ -115,7 +115,9 @@ router.post("/settings/privacy&security/password", requireLogin, (req, res) => {
                   if (err) {
                     return res.status(422).json({ error: err });
                   } else {
-                    return res.json({ message: "Password updated successfully." });
+                    return res.json({
+                      message: "Password updated successfully.",
+                    });
                   }
                 }
               );
@@ -128,12 +130,29 @@ router.post("/settings/privacy&security/password", requireLogin, (req, res) => {
           return console.log(e);
         });
     } else {
-      return res
-        .status(402)
-        .json({
-          message: "Old password should not be same with new password.",
-        });
+      return res.status(402).json({
+        message: "Old password should not be same with new password.",
+      });
     }
+  }
+});
+
+// Temporarily Deactivate Account
+
+// Delete Account Permanently
+router.post("/settings/manage&account/delete", requireLogin, (req, res) => {
+  try {
+    User.findByIdAndDelete(req.user._id, function (err, docs) {
+      if (!err) {
+        return res.json({ message: "Your account is permanently closed." });
+      } else {
+        return res
+          .status(422)
+          .json({ message: "Unable to delete your account" });
+      }
+    });
+  } catch (error) {
+    return res.status(422).json({ error: "Unable to find user" });
   }
 });
 

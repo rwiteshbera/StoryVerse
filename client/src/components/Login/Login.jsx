@@ -42,7 +42,7 @@ const Login = () => {
         localStorage.setItem("token", `Bearer ${data.token}`);
         localStorage.setItem("user", `${data.name}`);
         localStorage.setItem("id", `${data.userId}`);
-        localStorage.setItem("user_agent", JSON.stringify(data.user_agent))
+
         navigate("/");
 
         Notification.requestPermission().then((perm) => {
