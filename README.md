@@ -36,7 +36,7 @@ module.exports = {
 ```
 
 1. **MONGO_URI** : You will get mongodb uri once you create a database. URI helps to define connections between applications and MongoDB instances.
-2. **JWT_SECRET_KEY** : You can generate your own secret token from here. It will be used for authorization. -> [https://jwt.io/](https://jwt.io/)
+2. **JWT_SECRET_KEY** : You can generate your own secret token from here : [https://jwt.io/](https://jwt.io/). It will be used for authorization.
 3. **SENDER_EMAIL** : It is used in nodemailer for email service. Provide your email id.
 4. **SENDER_EMAIL_PASS** : Create your own app password inside gmail settings and add it here. It will connect nodemailer with your gmail without 2 factor authentication.
    > [WARNING]
