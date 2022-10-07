@@ -1,8 +1,7 @@
-## Pixby
-
-### A Full Stack Photo Sharing Application
-
-#### Installation
+# Pixby
+## A Full Stack Photo Sharing Application
+![image](https://user-images.githubusercontent.com/73098407/194613958-20b79c70-48c0-4d3a-98f8-abbfa6675fe8.png)
+### Installation
 
 - Run the `setup.sh` bash script to install all the modules
 

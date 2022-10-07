@@ -195,7 +195,7 @@ const Login = () => {
         <div className="panels-container">
           <div className="panel left-panel">
             <div className="content">
-              <h3>New here?</h3>
+              <h3>New to Pixby?</h3>
               <p>Don't Have an account?</p>
               <button
                 className="btn btn-transparent"
