@@ -2,9 +2,8 @@ import React from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Center, Flex, Input } from "@chakra-ui/react";
+import { Center, Flex, Icon, Input } from "@chakra-ui/react";
 import { BsPlusCircle } from "react-icons/bs";
-import { RiLogoutCircleRLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 import { AiOutlineHome } from "react-icons/ai";
 
@@ -74,8 +73,9 @@ const Navbar = () => {
       <Center bg="#fff" w="100%" p={4} color="black">
         <Flex id="nav-mobile" className="">
           <Link to="/" className="brand-logo left">
-            Logo
+            <Text fontSize="2xl" id="logoName">PixBy</Text>
           </Link>
+          
           <Input
             type="text"
             id="search_bar"
@@ -83,7 +83,7 @@ const Navbar = () => {
             onClick={search}
             onChange={search}
             bg="#efefef"
-            marginLeft={"5vw"}
+            marginLeft={"2vw"}
             placeholder={"Search"}
             value={SearchInput}
             autoComplete={"off"}
