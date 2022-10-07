@@ -5,7 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaLock, FaUser } from "react-icons/fa";
 import { GrMail } from "react-icons/gr";
-import {Text} from "@chakra-ui/react"
+import { Text } from "@chakra-ui/react";
 
 import Social_Bio from "./images/social_bio.svg";
 import Social_Share from "./images/social_share.svg";
@@ -38,18 +38,26 @@ const Login = () => {
           { email, password },
           axiosConfig
         );
-        console.log("Logged in successfully!");
-        localStorage.setItem("token", `Bearer ${data.token}`);
-        localStorage.setItem("user", `${data.name}`);
-        localStorage.setItem("id", `${data.userId}`);
+        console.log(data.isDeactivated);
+        if (data.isDeactivated === false) {
+          console.log("Logged in successfully!");
+          localStorage.setItem("token", `Bearer ${data.token}`);
+          localStorage.setItem("user", `${data.name}`);
+          localStorage.setItem("id", `${data.userId}`);
+          navigate("/");
 
-        navigate("/");
-
-        Notification.requestPermission().then((perm) => {
-          if (perm === "granted") {
-            new Notification("Logged in");
-          }
-        });
+          Notification.requestPermission().then((perm) => {
+            if (perm === "granted") {
+              new Notification("Logged in");
+            }
+          });
+        } else {
+          Notification.requestPermission().then((perm) => {
+            if (perm === "granted") {
+              new Notification(data.message);
+            }
+          });
+        }
       } catch (err) {
         console.log("ERROR" + err);
       } finally {
@@ -107,7 +115,6 @@ const Login = () => {
       <div className={signUpMode ? "container sign-up-mode" : "container"}>
         <div className="forms-container">
           <div className="login-signup">
-
             {/* Login */}
             <div className="log-in-form">
               <h2 className="title">Login</h2>
@@ -132,7 +139,11 @@ const Login = () => {
               <button onClick={LoginUser} className="btn login">
                 Login
               </button>
-              <Link to="/forget_password"><Text color="black" cursor="pointer" textDecoration="underline">Forget Password</Text></Link>
+              <Link to="/forget_password">
+                <Text color="black" cursor="pointer" textDecoration="underline">
+                  Forget Password
+                </Text>
+              </Link>
             </div>
 
             {/* Signup  */}

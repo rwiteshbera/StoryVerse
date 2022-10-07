@@ -138,22 +138,57 @@ router.post("/settings/privacy&security/password", requireLogin, (req, res) => {
 });
 
 // Temporarily Deactivate Account
+router.post("/settings/manage&account/deactivate", requireLogin, (req, res) => {
+  const { password } = req.body;
+
+  bcrypt
+    .compare(password, req.user.password)
+    .then((doMatch) => {
+      if (doMatch) {
+        User.findByIdAndUpdate(
+          req.user._id,
+          { isDeactivated: true },
+          { new: true },
+          (err, result) => {
+            if (err) {
+              return res
+                .status(422)
+                .json({ message: "Unable to deactivate your account" });
+            } else {
+              return res.json({
+                message: "Your account is temporarily deactivated.",
+              });
+            }
+          }
+        );
+      }
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
+    });
+});
 
 // Delete Account Permanently
 router.post("/settings/manage&account/delete", requireLogin, (req, res) => {
-  try {
-    User.findByIdAndDelete(req.user._id, function (err, docs) {
-      if (!err) {
-        return res.json({ message: "Your account is permanently closed." });
-      } else {
-        return res
-          .status(422)
-          .json({ message: "Unable to delete your account" });
+  const { password } = req.body;
+  bcrypt
+    .compare(password, req.user.password)
+    .then((doMatch) => {
+      if (doMatch) {
+        User.findByIdAndDelete(req.user._id, function (err, docs) {
+          if (!err) {
+            return res.json({ message: "Your account is permanently closed." });
+          } else {
+            return res
+              .status(422)
+              .json({ message: "Unable to delete your account" });
+          }
+        });
       }
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
     });
-  } catch (error) {
-    return res.status(422).json({ error: "Unable to find user" });
-  }
 });
 
 module.exports = router;

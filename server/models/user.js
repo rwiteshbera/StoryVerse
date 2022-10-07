@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
   following: [{ type: ObjectId, ref: "User" }],
   followers: [{ type: ObjectId, ref: "User" }],
   loggedInActivity: [{ type: String, required: true }],
+  isDeactivated: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
 });
 
 mongoose.model("User", userSchema);

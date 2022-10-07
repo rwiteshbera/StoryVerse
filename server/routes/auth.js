@@ -82,38 +82,63 @@ router.post("/signin", (req, res) => {
       if (!savedUser) {
         return res.status(422).json({ error: "Invalid email" });
       }
-
+      const { name, _id, following, followers, isDeactivated } = savedUser;
       bcrypt
         .compare(password, savedUser.password)
         .then((doMatch) => {
           if (doMatch) {
             const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET_KEY);
-
-            // Save Loggedin activity
-            User.findByIdAndUpdate(
-              savedUser._id,
-              {
-                // Saving user device os type
-                $push: { loggedInActivity: uaParser(req.headers["sec-ch-ua-platform"]).ua },
-              },
-              {
-                new: true,
-              }
-            ).exec((err, result) => {
-              if (err) {
-                return res.status(422).json({ error: err });
-              } else {
-                const { name, _id, following, followers } = savedUser;
-                res.json({
-                  token: token,
-                  name: name,
-                  userId: _id,
-                  following: following.length,
-                  followers: followers.length,
-                });
-              }
-            });
-
+            // Check whether the account is deactivated or not
+            if (!isDeactivated) {
+              // Save Loggedin activity
+              User.findByIdAndUpdate(
+                savedUser._id,
+                {
+                  // Saving user device os type
+                  $push: {
+                    loggedInActivity: uaParser(
+                      req.headers["sec-ch-ua-platform"]
+                    ).ua,
+                  },
+                },
+                {
+                  new: true,
+                }
+              ).exec((err, result) => {
+                if (err) {
+                  return res.status(422).json({ error: err });
+                } else {
+                  res.json({
+                    token: token,
+                    name: name,
+                    userId: _id,
+                    following: following.length,
+                    followers: followers.length,
+                    isDeactivated: isDeactivated,
+                  });
+                }
+              });
+            } else {
+              // If deactivated, activate it
+              User.findByIdAndUpdate(
+                savedUser._id,
+                { isDeactivated: false },
+                { new: true },
+                (err, result) => {
+                  if (err) {
+                    return res.status(422).json({
+                      message:
+                        "Unable to activate your account. Try again later.",
+                    });
+                  } else {
+                    return res.json({
+                      message:
+                        "Your temporarily deactivated account has been activated. Login once again to use.",
+                    });
+                  }
+                }
+              );
+            }
           } else {
             return res.status(422).json({ error: "Invalid password" });
           }
