@@ -1,6 +1,17 @@
 # Pixby
 ## A Full Stack Social Media Application
 ![image](https://user-images.githubusercontent.com/73098407/194613958-20b79c70-48c0-4d3a-98f8-abbfa6675fe8.png)
+
+### Built with
+1. React
+2. Vite
+3. Chakra UI
+4. NodeJs
+5. Express
+6. MongoDB
+7. Nodemailer
+8. Cloudinary
+
 ### Installation
 
 - Run the `setup.sh` bash script to install all the modules
@@ -28,7 +39,7 @@ module.exports = {
 2. **JWT_SECRET_KEY** : You can generate your own secret token from here. It will be used for authorization. -> [https://jwt.io/](https://jwt.io/)
 3. **SENDER_EMAIL** : It is used in nodemailer for email service. Provide your email id.
 4. **SENDER_EMAIL_PASS** : Create your own app password inside gmail settings and add it here. It will connect nodemailer with your gmail without 2 factor authentication.
-   > [!WARNING]
+   > [WARNING]
    > App Passwords aren’t recommended and are unnecessary in most cases. So it is important to keep them secret.
 5. **CLOUDINARY_NAME**, **CLOUDINARY_API_KEY**, **CLOUDINARY_API_SECRET** : Cloudinary will provide you once you register.
 
