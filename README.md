@@ -1,4 +1,4 @@
-## PixBy
+## Pixby
 
 ### A Full Stack Photo Sharing Application
 
