@@ -10,7 +10,7 @@ const {
   JWT_SECRET_KEY,
   SENDER_EMAIL_PASS,
   SENDER_EMAIL,
-  PORT_ID,
+  CLIENT_PORT_ID,
 } = require("../keys");
 const requireLogin = require("../middleware/requireLogin");
 
@@ -172,7 +172,7 @@ router.post("/reset_password", (req, res) => {
       const token = jwt.sign(payload, secret, { expiresIn: "15m" }); // Special link will be expired after 15 min
 
       // This is the special link that will be used to reset user password
-      const special_link = `http://localhost:${PORT_ID}/reset_password/${savedUser._id}/${token}`;
+      const special_link = `http://localhost:${CLIENT_PORT_ID}/reset_password/${savedUser._id}/${token}`;
 
       const message = {
         from: SENDER_EMAIL,

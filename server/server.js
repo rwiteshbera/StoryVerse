@@ -2,10 +2,12 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { MONGO_URI, PORT_ID } = require("./keys");
-const PORT = PORT_ID|| process.env.PORT;
+const cloudinary = require('cloudinary').v2;
+const { MONGO_URI, CLIENT_PORT_ID } = require("./keys");
+const PORT = CLIENT_PORT_ID|| process.env.PORT;
 
 app.use(cors())
+
 
 // Database configuration
 mongoose.connect(MONGO_URI, {
