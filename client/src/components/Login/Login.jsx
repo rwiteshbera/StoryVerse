@@ -141,14 +141,14 @@ const Login = () => {
               </button>
               <Link to="/forget_password">
                 <Text color="black" cursor="pointer" textDecoration="underline">
-                  Forget Password
+                  Forgot Password?
                 </Text>
               </Link>
             </div>
 
             {/* Signup  */}
             <div action="" className="sign-up-form">
-              <h2 className="title">Signup</h2>
+              <h2 className="title">Sign Up</h2>
               <div className="input-field">
                 <FaUser className="i" />
                 <input
@@ -186,7 +186,7 @@ const Login = () => {
                 />
               </div>
               <button onClick={Signup} type="submit" className="btn signup">
-                Signup
+                Sign Up
               </button>
             </div>
           </div>
@@ -196,13 +196,13 @@ const Login = () => {
           <div className="panel left-panel">
             <div className="content">
               <h3>New to Pixby?</h3>
-              <p>Don't Have an account?</p>
+              <p>Don't have an account?</p>
               <button
                 className="btn btn-transparent"
                 id="sign-up-btn"
                 onClick={signup_handler}
               >
-                Signup
+                Sign Up
               </button>
             </div>
             <img src={Social_Bio} className="image" />
