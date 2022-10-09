@@ -11,7 +11,7 @@ const {
   CLOUDINARY_NAME,
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
-} = require("../keys");
+} = process.env;
 const parser = new DataUriParser();
 
 // Return "https" URLs by setting secure: true

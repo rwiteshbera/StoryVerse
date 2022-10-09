@@ -3,7 +3,12 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cloudinary = require('cloudinary').v2;
-const { MONGO_URI, CLIENT_PORT_ID } = require("./keys");
+
+require('dotenv').config()
+
+
+const { MONGO_URI, CLIENT_PORT_ID } = process.env;
+
 const PORT = CLIENT_PORT_ID|| process.env.PORT;
 
 app.use(cors())
