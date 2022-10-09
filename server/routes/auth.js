@@ -11,7 +11,7 @@ const {
   SENDER_EMAIL_PASS,
   SENDER_EMAIL,
   CLIENT_PORT_ID,
-} = process.env;
+} = require("../keys");
 const requireLogin = require("../middleware/requireLogin");
 
 router.get("/", (req, res) => {
