@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     try {
         if (req.header('authorization')) {
             const token = req.header('authorization');
