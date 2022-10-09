@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {CLOUDINARY_NAME} = require("../keys");
 const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema({
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
   profilePhoto: {
     type: String,
     default:
-      "https://res.cloudinary.com/dflvpcsin/image/upload/v1662910341/DefaultProfilePhoto/blank-profile-picture-973460_1280_veumtr.png",
+      `https://res.cloudinary.com/${CLOUDINARY_NAME}/image/upload/v1662910341/DefaultProfilePhoto/blank-profile-picture-973460_1280_veumtr.png`,
   },
   gender: {
     type: String,
