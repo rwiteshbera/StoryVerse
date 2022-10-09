@@ -7,17 +7,23 @@ module.exports = (req, res, next) => {
         if (req.header('authorization')) {
             const token = req.header('authorization');
             const data = jwt.verify(token, process.env.JWT_SECRET_KEY);
-            const user = await User.findById(data._id);
-            if (user) {
-                if (user.isDeactivated) {
-                    throw new Error('User is deactivated');
-                } else {
-                    req.user = user;
-                    next();
+            User.findById(data._id).then((user) => {
+                try {
+                    if (user) {
+                        if (user.isDeactivated) {
+                            throw new Error('User is deactivated');
+                        } else {
+                            req.user = user;
+                            next();
+                        }
+                    } else {
+                        throw new Error('Invalid token !');
+                    }
+                } catch (error) {
+                    console.log(error)
+                    res.status(401).json({ error: error.message });
                 }
-            } else {
-                throw new Error('Invalid token !');
-            }
+            })
         } else {
             throw new Error('User must be logged in !');
         }
