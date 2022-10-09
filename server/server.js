@@ -2,12 +2,15 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cloudinary = require('cloudinary').v2;
+
 
 const { MONGO_URI, CLIENT_PORT_ID } = require("./keys");
 
-const PORT = CLIENT_PORT_ID || process.env.PORT;
+const PORT = CLIENT_PORT_ID|| process.env.PORT;
 
-app.use(cors());
+app.use(cors())
+
 
 // Database configuration
 mongoose.connect(MONGO_URI, {
@@ -25,13 +28,14 @@ mongoose.connection.on("error", (err) => {
 require("./models/user");
 require("./models/post");
 
+
 app.use(express.json());
 
 // React Router
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
 app.use(require("./routes/user"));
-app.use(require("./routes/settings"));
+app.use(require("./routes/settings"))
 
 app.listen(PORT, () => {
   console.log(`Server is listening at: http://localhost:${PORT}/`);

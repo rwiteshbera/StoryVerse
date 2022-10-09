@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
+const requireLogin = require("../middleware/requireLogin");
+
+// Cloudinary Setup
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const requireLogin = require("../middleware/requireLogin");
 const path = require("path");
 const DataUriParser = require("datauri/parser");
 const {
@@ -21,6 +23,7 @@ cloudinary.config({
   api_key: CLOUDINARY_API_KEY,
   cloud_name: CLOUDINARY_NAME,
 });
+// Cloudinary Setup
 
 // Get the posts of the users you follow in homepage
 router.get("/feedPosts", requireLogin, (req, res) => {
@@ -37,50 +40,40 @@ router.get("/feedPosts", requireLogin, (req, res) => {
 const upload = multer();
 // Upload new image on socials
 router.post("/upload", upload.single("file"), requireLogin, (req, res) => {
-  try {
-    if (!req.body.file && !req.body.captions) {
-      const extname = path.extname(req.file.originalname).toString();
-      const file64 = parser.format(extname, req.file.buffer);
-      // Use the uploaded file's name as the asset's public ID and
-      // allow overwriting the asset with new versions
-      const options = {
-        use_filename: true,
-        unique_filename: false,
-        overwrite: true,
-      };
-
-      try {
-        cloudinary.uploader
-          .upload(file64.content, options)
-          .then((data) => {
-            console.log(data.url);
-            return res.json(data);
-          })
-          .catch((e) => {
-            return res.status(422).json({ error: e });
-          });
-
-        const post = new Post({
-          captions: req.body.captions,
-          photo: data.url,
-          postedBy: req.user,
-        });
-
-        post
-          .save()
-          .then(() => {
-            res.json({ message: "Posted successfully" });
-          })
-          .catch((err) => {
-            res.status(401).json({ err });
-          });
-      } catch (error) {
-        res.json({ "Failed to upload data": error });
-      }
-    }
-  } catch (e) {
-    return res.status(422).json({ error: e });
+  if (!req.body.file && !req.body.captions) {
+    return res.json({ message: "Input field shouldn't be empty." });
   }
+  const extname = path.extname(req.file.originalname).toString();
+  const file64 = parser.format(extname, req.file.buffer);
+  // Use the uploaded file's name as the asset's public ID and
+  // allow overwriting the asset with new versions
+  const options = {
+    use_filename: true,
+    unique_filename: false,
+    overwrite: true,
+  };
+
+  cloudinary.uploader
+    .upload(file64.content, options)
+    .then((data) => {
+      const post = new Post({
+        captions: req.body.captions,
+        photo: data.secure_url,
+        postedBy: req.user,
+      });
+
+      post
+        .save()
+        .then(() => {
+          res.json({ message: "Posted successfully" });
+        })
+        .catch((err) => {
+          res.status(401).json({ err });
+        });
+    })
+    .catch((e) => {
+      return res.status(422).json({ error: e });
+    });
 });
 
 // All the post created by the logged-in user

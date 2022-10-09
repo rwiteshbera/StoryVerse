@@ -5,10 +5,40 @@ const Post = mongoose.model("Post");
 const User = mongoose.model("User");
 const requireLogin = require("../middleware/requireLogin");
 
+// Cloudinary Setup
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const path = require("path");
+const DataUriParser = require("datauri/parser");
+const {
+  CLOUDINARY_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+} = require("../keys");
+const parser = new DataUriParser();
+
+// Return "https" URLs by setting secure: true
+cloudinary.config({
+  secure: true,
+  api_secret: CLOUDINARY_API_SECRET,
+  api_key: CLOUDINARY_API_KEY,
+  cloud_name: CLOUDINARY_NAME,
+});
+// Cloudinary Setup
+
 // fetch logged-in user data
 router.get("/me", requireLogin, (req, res) => {
-  const { _id, name, username, email, gender, followers, following, profilePhoto, loggedInActivity } =
-    req.user;
+  const {
+    _id,
+    name,
+    username,
+    email,
+    gender,
+    followers,
+    following,
+    profilePhoto,
+    loggedInActivity,
+  } = req.user;
   return res.json({
     _id,
     name,
@@ -18,26 +48,53 @@ router.get("/me", requireLogin, (req, res) => {
     followers,
     following,
     profilePhoto,
-    loggedInActivity
+    loggedInActivity,
   });
 });
 
+const upload = multer();
 // Change your profile Photo
-router.patch("/change_profile_pic", requireLogin, (req, res) => {
-  User.findByIdAndUpdate(
-    req.user._id,
-    { profilePhoto: req.body.profilePicURL },
-    { new: true },
-    (err, result) => {
-      if (err) {
-        return res.status(422).json({ error: err });
-      } else {
-        // console.log(result)
-        return res.json({ message: result });
-      }
+router.patch(
+  "/change_profile_pic",
+  upload.single("file"),
+  requireLogin,
+  (req, res) => {
+    if (!req.file) {
+      return res.json({ message: "No image found" });
     }
-  );
-});
+
+    const extname = path.extname(req.file.originalname).toString();
+    const file64 = parser.format(extname, req.file.buffer);
+    // Use the uploaded file's name as the asset's public ID and
+    // allow overwriting the asset with new versions
+    const options = {
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
+
+    cloudinary.uploader
+      .upload(file64.content, options)
+      .then((data) => {
+        User.findByIdAndUpdate(
+          req.user._id,
+          { profilePhoto: data.secure_url },
+          { new: true },
+          (err, result) => {
+            if (err) {
+              return res.status(422).json({ error: err });
+            } else {
+              // console.log(result)
+              return res.json({ message: result });
+            }
+          }
+        );
+      })
+      .catch((e) => {
+        return res.status(422).json({ error: e });
+      });
+  }
+);
 
 // See other user's profile
 router.get("/user/:id", requireLogin, (req, res) => {

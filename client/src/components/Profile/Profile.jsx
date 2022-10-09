@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
+
 import "./Profile.css";
 import {
   Box,
@@ -83,32 +84,29 @@ const Profile = () => {
     }
   };
 
-  const changeProfilePhoto = async () => {
-    const data = new FormData();
-    data.append("file", profilePicState);
-    data.append("upload_preset", "social_media_cloudinary");
-    data.append("cloud_name", "dflvpcsin");
-
+  const changeProfilePhoto = () => {
     const axiosConfig = {
       headers: {
-        "Content-type": "application/json",
+        "Content-type": "multipart/form-data",
         Authorization: token,
       },
     };
 
     try {
-      const imageInfo = await axios.post(
-        "https://api.cloudinary.com/v1_1/dflvpcsin/image/upload",
-        data
-      );
-
-      const info = await axios.patch(
-        "http://localhost:5050/change_profile_pic",
-        { profilePicURL: imageInfo.data.secure_url },
-        axiosConfig
-      );
-
-      setMyProfilePhoto(imageInfo.data.secure_url);
+      const imageData = new FormData();
+      imageData.append("file", profilePicState);
+      axios
+        .patch(
+          "http://localhost:5050/change_profile_pic",
+          imageData,
+          axiosConfig
+        )
+        .then((data) => {
+          return console.log(data);
+        })
+        .catch((e) => {
+          return console.log(e);
+        });
     } catch (error) {
       console.log(error);
     }

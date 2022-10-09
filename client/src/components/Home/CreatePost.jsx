@@ -30,7 +30,7 @@ const CreatePost = () => {
         .post("http://localhost:5050/upload", imageData, axiosConfig)
         .then((res) => {
           console.log(res.data);
-          navigate("/profile");
+          // navigate("/profile");
         })
         .catch((err) => {
           console.log(err);
