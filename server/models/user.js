@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const {CLOUDINARY_NAME} = require("../keys");
 const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema({

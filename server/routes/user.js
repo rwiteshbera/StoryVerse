@@ -10,19 +10,14 @@ const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
 const DataUriParser = require("datauri/parser");
-const {
-  CLOUDINARY_NAME,
-  CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET,
-} = require("../keys");
-const parser = new DataUriParser();
+const dotenv = require('dotenv').config()
 
 // Return "https" URLs by setting secure: true
 cloudinary.config({
   secure: true,
-  api_secret: CLOUDINARY_API_SECRET,
-  api_key: CLOUDINARY_API_KEY,
-  cloud_name: CLOUDINARY_NAME,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  cloud_name: process.env.CLOUDINARY_NAME,
 });
 // Cloudinary Setup
 

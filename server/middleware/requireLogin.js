@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET_KEY } = require("../keys");
+const dotenv = require('dotenv').config()
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
+
+JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 
 module.exports = (req, res, next) => {
   try {
