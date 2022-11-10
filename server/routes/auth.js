@@ -6,13 +6,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const uaParser = require("ua-parser-js");
 const nodemailer = require("nodemailer");
-const {
-  JWT_SECRET_KEY,
-  SENDER_EMAIL_PASS,
-  SENDER_EMAIL,
-  CLIENT_PORT_ID,
-} = require("../keys");
+
+const dotenv = require('dotenv').config()
+
 const requireLogin = require("../middleware/requireLogin");
+
+JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
+SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS
+SENDER_EMAIL = process.env.SENDER_EMAIL
+
 
 router.get("/", (req, res) => {
   res.send("Hello from HOME");

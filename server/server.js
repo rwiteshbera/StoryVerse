@@ -5,9 +5,11 @@ const cors = require("cors");
 const cloudinary = require('cloudinary').v2;
 
 
-const { MONGO_URI, CLIENT_PORT_ID } = require("./keys");
+const dotenv = require('dotenv').config()
 
-const PORT = CLIENT_PORT_ID|| process.env.PORT;
+
+const MONGO_URI = process.env.MONGO_URI;
+const PORT = 5050 || process.env.CLIENT_PORT_ID;
 
 app.use(cors())
 
