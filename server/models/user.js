@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+const dotenv = require('dotenv').config()
+
+CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
+
 const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema({
