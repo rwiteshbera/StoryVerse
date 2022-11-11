@@ -50,7 +50,7 @@ const EditProfile = () => {
       if (isNameChanged || isGenderChanged) {
         axios
           .post(
-            `http://localhost:5050/settings/edit&profile/name&gender`,
+            `/settings/edit&profile/name&gender`,
             { name, gender },
             axiosConfig
           )
@@ -66,7 +66,7 @@ const EditProfile = () => {
       if (isUsernameChanged) {
         axios
           .post(
-            `http://localhost:5050/settings/edit&profile/username`,
+            `/settings/edit&profile/username`,
             { username },
             axiosConfig
           )
@@ -88,7 +88,7 @@ const EditProfile = () => {
       if (isEmailChanged) {
         axios
           .post(
-            `http://localhost:5050/settings/edit&profile/email`,
+            `/settings/edit&profile/email`,
             { email },
             axiosConfig
           )
@@ -113,7 +113,7 @@ const EditProfile = () => {
   // Fetch setttings data
   const fetchData = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5050/me", axiosConfig);
+      const { data } = await axios.get("/me", axiosConfig);
       setName(data.name);
       setUsername(data.username);
       setEmail(data.email);

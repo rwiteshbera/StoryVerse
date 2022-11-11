@@ -60,7 +60,7 @@ const Profile = () => {
       if (id === userid) navigate("/profile");
 
       const { data } = await axios.get(
-        `http://localhost:5050/user/${userid}`,
+        `/user/${userid}`,
         axiosConfig
       );
       setUserPhotos(data.posts);
@@ -74,7 +74,7 @@ const Profile = () => {
 
   const followUser = (id) => {
     axios
-      .put("http://localhost:5050/follow", { followId: id }, axiosConfig)
+      .put("/follow", { followId: id }, axiosConfig)
       .then((res) => {
         fetchUserImage();
       })
@@ -85,7 +85,7 @@ const Profile = () => {
 
   const unFollowUser = (id) => {
     axios
-      .put("http://localhost:5050/unfollow", { unfollowId: id }, axiosConfig)
+      .put("/unfollow", { unfollowId: id }, axiosConfig)
       .then((res) => {
         fetchUserImage();
         onClose();
@@ -97,7 +97,7 @@ const Profile = () => {
 
   const getFollowing = async () => {
     const info = await axios.post(
-      `http://localhost:5050/get_following`,
+      `/get_following`,
       { following },
       axiosConfig
     );
@@ -106,7 +106,7 @@ const Profile = () => {
 
   const getFollowers = async () => {
     const info = await axios.post(
-      `http://localhost:5050/get_followers`,
+      `/get_followers`,
       { followers },
       axiosConfig
     );

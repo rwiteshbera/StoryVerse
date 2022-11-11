@@ -33,8 +33,9 @@ const Login = () => {
       return;
     } else {
       try {
+        console.log("Logging")
         const { data } = await axios.post(
-          "http://localhost:5050/signin",
+          "/signin",
           { email, password },
           axiosConfig
         );
@@ -73,9 +74,10 @@ const Login = () => {
       if (!name || !username || !email || !password) {
         return;
       }
+      console.log("Posting")
 
       const { data } = await axios.post(
-        "http://localhost:5050/signup",
+        "/signup",
         { name, username, email, password },
         axiosConfig
       );

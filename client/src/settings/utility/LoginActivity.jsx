@@ -20,7 +20,7 @@ const LoginActivity = () => {
         },
       };
 
-      const { data } = await axios.get("http://localhost:5050/me", axiosConfig);
+      const { data } = await axios.get("/me", axiosConfig);
       setLoggedInData(data.loggedInActivity.reverse().slice(0, 5));
     } catch (e) {
       console.log(e);

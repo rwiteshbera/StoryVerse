@@ -27,7 +27,7 @@ const CreatePost = () => {
       imageData.append("captions", captions);
 
       axios
-        .post("http://localhost:5050/upload", imageData, axiosConfig)
+        .post("/upload", imageData, axiosConfig)
         .then((res) => {
           console.log(res.data);
           // navigate("/profile");

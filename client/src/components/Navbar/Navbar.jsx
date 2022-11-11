@@ -54,7 +54,7 @@ const Navbar = () => {
     onOpen();
     try {
       const { data } = await axios.post(
-        "http://localhost:5050/search",
+        "/search",
         { query: e.target.value },
         axiosConfig
       );

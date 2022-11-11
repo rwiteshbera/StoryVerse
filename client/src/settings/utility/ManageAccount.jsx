@@ -70,7 +70,7 @@ const ManageAccount = () => {
     if (!isPasswordEmpty) {
       try {
         const { data } = await axios.post(
-          `http://localhost:5050/settings/manage&account/${modalButtonText.toLowerCase()}`,
+          `/settings/manage&account/${modalButtonText.toLowerCase()}`,
           {password},
           axiosConfig
         );

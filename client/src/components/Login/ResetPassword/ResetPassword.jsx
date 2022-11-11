@@ -27,7 +27,7 @@ const ResetPassword = () => {
         },
       };
 
-    const {data} = await axios.post(`http://localhost:5050/reset_password/${id}/${token}`, {newPassword}, axiosConfig)
+    const {data} = await axios.post(`/reset_password/${id}/${token}`, {newPassword}, axiosConfig)
     setMessage(data.message)
   }
 

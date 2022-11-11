@@ -32,7 +32,7 @@ const ForgetPassword = () => {
 
     if (!isEmpty) {
       const { data } = await axios.post(
-        "http://localhost:5050/reset_password",
+        "/reset_password",
         { email },
         axiosConfig
       );

@@ -23,7 +23,7 @@ const Home = () => {
   // Post like handler
   const likePost = (id) => {
     axios
-      .put("http://localhost:5050/like", { postId: id }, axiosConfig)
+      .put("/like", { postId: id }, axiosConfig)
       .then((res) => {
         getFeedPosts();
       })
@@ -35,7 +35,7 @@ const Home = () => {
   // Post unlike handler
   const unLikePost = (id) => {
     axios
-      .put("http://localhost:5050/unlike", { postId: id }, axiosConfig)
+      .put("/unlike", { postId: id }, axiosConfig)
       .then((res) => {
         getFeedPosts();
       })
@@ -47,7 +47,7 @@ const Home = () => {
   // Get feed posts handler
   const getFeedPosts = () => {
     try {
-      axios.get("http://localhost:5050/feedposts", axiosConfig).then((res) => {
+      axios.get("/feedposts", axiosConfig).then((res) => {
         setFeedData(res.data?.posts.reverse());
       });
     } catch (e) {

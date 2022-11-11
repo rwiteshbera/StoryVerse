@@ -38,7 +38,7 @@ const PrivacySecurity = () => {
           // Make update password api call
           axios
             .post(
-              `http://localhost:5050/settings/privacy&security/password`,
+              `/settings/privacy&security/password`,
               { oldPassword, newPassword },
               axiosConfig
             )

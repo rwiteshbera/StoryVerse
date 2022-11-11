@@ -54,7 +54,7 @@ const Profile = () => {
 
   const fetchUserImage = async () => {
     const { data } = await axios.get(
-      "http://localhost:5050/mypost",
+      "/mypost",
       axiosConfig
     );
     setMyPhotos(data.reverse());
@@ -62,7 +62,7 @@ const Profile = () => {
 
   const fetchUserData = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5050/me", axiosConfig);
+      const { data } = await axios.get("/me", axiosConfig);
       setMyName(data.name);
       setMyFollowing(data.following);
       setMyFollowers(data.followers);
@@ -75,7 +75,7 @@ const Profile = () => {
   const deletePost = async (postId, userId) => {
     if (userId === localStorage.getItem("id")) {
       const res = await axios.delete(
-        `http://localhost:5050/delete/${postId}`,
+        `/delete/${postId}`,
         axiosConfig
       );
       console.log("Deleted");
@@ -97,7 +97,7 @@ const Profile = () => {
       imageData.append("file", profilePicState);
       axios
         .patch(
-          "http://localhost:5050/change_profile_pic",
+          "/change_profile_pic",
           imageData,
           axiosConfig
         )
@@ -114,7 +114,7 @@ const Profile = () => {
 
   const getFollowing = async () => {
     const info = await axios.post(
-      `http://localhost:5050/get_following`,
+      `/get_following`,
       { following: myFollowing },
       axiosConfig
     );
@@ -124,7 +124,7 @@ const Profile = () => {
   const getFollowers = async () => {
     try {
       const info = await axios.post(
-        `http://localhost:5050/get_followers`,
+        `/get_followers`,
         { followers: myFollowers },
         axiosConfig
       );
