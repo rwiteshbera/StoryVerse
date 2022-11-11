@@ -51,6 +51,11 @@ SERVER_BASE_URL=
 5. **CLOUDINARY_NAME**, **CLOUDINARY_API_KEY**, **CLOUDINARY_API_SECRET** :
    Cloudinary will provide you once you register.
 
+- Add SERVER BASE URL in a `.env` file in client folder.
+```
+VITE_SERVER_BASE_URL=
+```
+
 - Now, run the entire project by using `run.sh` bash script
 
 ```bash
