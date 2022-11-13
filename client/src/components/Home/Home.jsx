@@ -91,6 +91,7 @@ const Home = () => {
                 <Text>{item.captions}</Text>
                 <Flex>
                   <Text>{item.likes.length} Likes</Text>
+                
                   <Flex margin={"0.3rem 1rem"}>
                     {item.likes.includes(loggedIn_userId) ? (
                       <FaHeart
@@ -104,7 +105,10 @@ const Home = () => {
                         cursor={"pointer"}
                       />
                     )}
+                    <br/>
+                     
                   </Flex>
+                  <Text><b>Comments</b></Text>
                 </Flex>
               </Box>
             </Box>

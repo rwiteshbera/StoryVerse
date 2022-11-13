@@ -22,6 +22,7 @@ import {
   Button,
   List,
   ListItem,
+  Square,
 } from "@chakra-ui/react";
 
 const Profile = () => {
@@ -199,6 +200,7 @@ const Profile = () => {
       <Center margin={"4rem 15%"}>
         <Flex
           gap={"0.5rem"}
+          width={"100vw"}
           border={"2px solid #e4e6e7"}
           flexWrap={"wrap"}
           padding={"0.4rem"}
@@ -206,13 +208,14 @@ const Profile = () => {
         >
           {myPhotos.map((item, key) => {
             return (
-              <Image src={item.photo} w={"30%"} key={key} />
-              // <>
-              //   <button onClick={() => deletePost(item._id, item.postedBy)}>
-              //     Delete
-              //   </button>
-              //   <img src={item.photo} key={item._id} />
-              // </>
+              <>
+             <div id="photo-user">
+             <Image src={item.photo} key={key} />
+              <button onClick={() => deletePost(item._id, item.postedBy)}>
+                  Delete
+              </button>
+             </div>
+              </>
             );
           })}
         </Flex>

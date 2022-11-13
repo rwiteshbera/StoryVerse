@@ -10,7 +10,22 @@
     column-gap: 0.5rem;
     flex-direction: row;
 }
-#gallery img{
+
+#photo-user{
+    width: 25%;
+}
+
+#photo-user button {
+    position: relative;
+    top: -12%;
+    background-color: white;
+    padding: 0em 0.5em;
+    border: 2px solid black;
+    margin: 0.2em 0.2em;
+    color: black;
+}
+#photo-user button:hover {
+    background-color: red;
     border: 2px solid red;
-    width: 15vw;
+    color: white;
 }

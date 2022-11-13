@@ -12,6 +12,8 @@ const path = require("path");
 const DataUriParser = require("datauri/parser");
 const dotenv = require('dotenv').config()
 
+const parser = new DataUriParser();
+
 // Return "https" URLs by setting secure: true
 cloudinary.config({
   secure: true,
