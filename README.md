@@ -2,7 +2,10 @@
 
 ## A Full Stack Social Media Application
 
-![image](https://user-images.githubusercontent.com/73098407/194613958-20b79c70-48c0-4d3a-98f8-abbfa6675fe8.png)
+<img src="https://user-images.githubusercontent.com/73098407/194613958-20b79c70-48c0-4d3a-98f8-abbfa6675fe8.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530594-76c0aa3f-facc-4f4e-b362-405457568479.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530540-08a80e66-a830-45bb-b09d-687a7bcb2c00.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530541-7c6457b9-73b3-4158-a111-ec2ef5cd29a5.png" width="45%"></img> 
+
+### More Screenshots
+
 
 ### Built with
 
