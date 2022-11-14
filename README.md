@@ -1,32 +1,14 @@
-# Pixby
-
-## A Full Stack Social Media Application
-
-<img src="https://user-images.githubusercontent.com/73098407/194613958-20b79c70-48c0-4d3a-98f8-abbfa6675fe8.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530594-76c0aa3f-facc-4f4e-b362-405457568479.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530540-08a80e66-a830-45bb-b09d-687a7bcb2c00.png" width="45%"></img> <img src="https://user-images.githubusercontent.com/73098407/201530541-7c6457b9-73b3-4158-a111-ec2ef5cd29a5.png" width="45%"></img> 
-
-### [More Screenshots](Screenshots.md)
-
-
-### Built with
-
-1. React
-2. Vite
-3. Chakra UI
-4. NodeJs
-5. Express
-6. MongoDB
-7. Nodemailer
-8. Cloudinary
+## Server
 
 ### Installation
 
-- Run the `setup.sh` bash script to install all the modules
+- Run the following command to install dependencies
 
 ```bash
-bash setup.sh
+npm install
 ```
 
-- Create a `.env` file inside `server` folder. Copy the following code
+- Create a `.env` file and copy the following code
   snippet add all the secret keys.
 
 ```js
@@ -54,19 +36,4 @@ SERVER_BASE_URL=
 5. **CLOUDINARY_NAME**, **CLOUDINARY_API_KEY**, **CLOUDINARY_API_SECRET** :
    Cloudinary will provide you once you register.
 
-- Add SERVER BASE URL in a `.env` file in client folder.
-```
-VITE_SERVER_BASE_URL=
-```
-
-- Now, run the entire project by using `run.sh` bash script
-
-```bash
-bash run.sh
-```
-
-## Our Contributors
-
-<a href="https://github.com/rwiteshbera/Pixby/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=rwiteshbera/Pixby" />
-</a>
+- Run the server by `npm run dev`
