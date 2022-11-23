@@ -12,16 +12,6 @@ const PrivacySecurity = () => {
   const [showUpdateResponse, setShowUpdateResponse] = useState(false);
   const [responseMessageColor, setResponseMessageColor] = useState("red");
 
-  let token = localStorage.getItem("token");
-
-  const axiosConfig = {
-    headers: {
-      "Content-type": "application/json",
-      responseType: "json",
-      Authorization: token,
-    },
-  };
-
   const updatePassword = () => {
     if (!oldPassword || !newPassword || !confirmNewPassword) {
       setShowUpdateResponse(true);
@@ -36,6 +26,17 @@ const PrivacySecurity = () => {
         if (newPassword === confirmNewPassword) {
           setShowUpdateResponse(true);
           // Make update password api call
+
+          const token = localStorage.getItem("token");
+
+          const axiosConfig = {
+            headers: {
+              "Content-type": "application/json",
+              responseType: "json",
+              Authorization: token,
+            },
+          };
+
           axios
             .post(
               `/settings/privacy&security/password`,
@@ -46,6 +47,7 @@ const PrivacySecurity = () => {
               setShowUpdateResponse(true);
               setResponseMessageColor("green");
               setUpdateResponseMessage(res.data.message);
+              localStorage.setItem("token", `Bearer ${res.data.token}`);
               setOldPassword("");
               setNewPassowrd("");
               setConfirmNewPassword("");

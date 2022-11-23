@@ -14,6 +14,7 @@ import LoginActivity from "./settings/utility/LoginActivity";
 import ManageAccount from "./settings/utility/ManageAccount";
 import ForgetPassword from "./components/Login/ForgetPassword/ForgetPassword";
 import ResetPassword from "./components/Login/ResetPassword/ResetPassword";
+import axios from "axios";
 
 const App = () => {
   const navigate = useNavigate();
@@ -25,12 +26,33 @@ const App = () => {
     // If user is not loggedin, then redirect to login page
     // If user want to go to reset password or forget password page, by default he is not logged in, hence don't redirect to login
 
-    if (!user && location.pathname === "/forget_password") {
-      navigate("/forget_password");
-    } else if (!user && !location.pathname.startsWith("/reset_password")) {
+    if (
+      !user &&
+      !location.pathname.startsWith("/reset_password") &&
+      !location.pathname.startsWith("/forget_password")
+    )
       navigate("/login");
-    } else if (!user && location.pathname.startsWith("/reset_password")) {
-      // Do nothing
+
+    // if the token is invalid, log the user out
+    if (user) {
+      const token = localStorage.getItem("token");
+
+      const axiosConfig = {
+        headers: {
+          Authorization: token,
+        },
+      };
+
+      axios
+        .get("/me", axiosConfig)
+        .then(console.log)
+        .catch(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          localStorage.removeItem("id");
+          localStorage.removeItem("user_agent");
+          navigate("/login");
+        });
     }
   }, []);
 
