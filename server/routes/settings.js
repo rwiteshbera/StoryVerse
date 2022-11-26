@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -111,11 +112,16 @@ router.post("/settings/privacy&security/password", requireLogin, (req, res) => {
                 req.user._id,
                 { password: hashedPassword },
                 { new: true },
-                (err, result) => {
+                (err, savedUser) => {
                   if (err) {
                     return res.status(422).json({ error: err });
                   } else {
+                    const token = jwt.sign(
+                      { _id: savedUser._id },
+                      savedUser.password
+                    );
                     return res.json({
+                      token,
                       message: "Password updated successfully.",
                     });
                   }

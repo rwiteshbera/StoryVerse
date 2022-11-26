@@ -7,14 +7,13 @@ const jwt = require("jsonwebtoken");
 const uaParser = require("ua-parser-js");
 const nodemailer = require("nodemailer");
 
-const dotenv = require('dotenv').config()
+const dotenv = require("dotenv").config();
 
 const requireLogin = require("../middleware/requireLogin");
 
-JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
-SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS
-SENDER_EMAIL = process.env.SENDER_EMAIL
-SERVER_BASE_URL = process.env.SERVER_BASE_URL
+SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS;
+SENDER_EMAIL = process.env.SENDER_EMAIL;
+SERVER_BASE_URL = process.env.SERVER_BASE_URL;
 
 router.get("/", (req, res) => {
   res.send("Hello from HOME");
@@ -89,7 +88,7 @@ router.post("/signin", (req, res) => {
         .compare(password, savedUser.password)
         .then((doMatch) => {
           if (doMatch) {
-            const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET_KEY);
+            const token = jwt.sign({ _id: savedUser._id }, savedUser.password);
             // Check whether the account is deactivated or not
             if (!isDeactivated) {
               // Save Loggedin activity
@@ -164,7 +163,7 @@ router.post("/reset_password", (req, res) => {
         return res.json("Email is not registered yet.");
       }
 
-      const secret = JWT_SECRET_KEY + savedUser.password;
+      const secret = savedUser.password;
 
       const payload = {
         email: email,
@@ -174,7 +173,7 @@ router.post("/reset_password", (req, res) => {
       const token = jwt.sign(payload, secret, { expiresIn: "15m" }); // Special link will be expired after 15 min
 
       // This is the special link that will be used to reset user password
-      const special_link = `{SERVER_BASE_URL}/reset_password/${savedUser._id}/${token}`;
+      const special_link = `${SERVER_BASE_URL}/reset_password/${savedUser._id}/${token}`;
 
       const message = {
         from: SENDER_EMAIL,
@@ -219,7 +218,7 @@ router.get("/reset_password/:id/:token", (req, res) => {
       if (!savedUser) {
         return res.send("User not found");
       }
-      const secret = JWT_SECRET_KEY + savedUser.password;
+      const secret = savedUser.password;
 
       try {
         const payload = jwt.verify(token, secret);
@@ -250,7 +249,7 @@ router.post("/reset_password/:id/:token", (req, res) => {
       if (!savedUser) {
         return res.json("Invalid reset link");
       }
-      const secret = JWT_SECRET_KEY + savedUser.password;
+      const secret = savedUser.password;
 
       try {
         const payload = jwt.verify(token, secret);

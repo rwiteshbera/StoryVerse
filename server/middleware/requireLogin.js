@@ -1,9 +1,8 @@
 const jwt = require("jsonwebtoken");
-const dotenv = require('dotenv').config()
+const jwt_decode = require("jwt-decode");
+const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
-
-JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 
 module.exports = (req, res, next) => {
   try {
@@ -15,20 +14,24 @@ module.exports = (req, res, next) => {
     }
 
     const token = req.headers.authorization.split(" ")[1];
-    jwt.verify(token, JWT_SECRET_KEY, (err, payload) => {
-      if (err) {
-        return res
-          .status(401)
-          .json({ error: "You must be logged in", err, token, JWT_SECRET_KEY });
-      }
 
-      const { _id } = payload;
-      User.findById(_id).then((userData) => {
+    const { _id } = jwt_decode(token);
+
+    User.findById(_id).then((userData) => {
+      jwt.verify(token, userData.password, (err) => {
+        if (err) {
+          return res.status(401).json({
+            error: "You must be logged in",
+            err,
+            token,
+          });
+        }
         req.user = userData;
         next();
       });
     });
   } catch (error) {
     console.log(error);
+    res.status(401).json({ error: "Authorization failed" });
   }
 };
