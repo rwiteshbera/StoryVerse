@@ -1,0 +1,30 @@
+version: "3"
+services:
+  client:
+    build:
+      context: ./client
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_SERVER_BASE_URL=http://localhost:5050
+    command: sh -c "npm install && npm run dev"
+  server:
+    build:
+      context: ./server
+    ports:
+      - "5050:5050"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/pixby
+      - SENDER_EMAIL=
+      - SENDER_EMAIL_PASS=
+      - CLOUDINARY_NAME=
+      - CLOUDINARY_API_KEY=
+      - CLOUDINARY_API_SECRET=
+      - SERVER_BASE_URL=http://localhost:5050
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
