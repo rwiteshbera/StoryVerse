@@ -25,9 +25,8 @@
 ## Installation
 Once you have these prerequisites, you can follow these steps to set up the project:
 
-1. Clone the repository from https://github.com/rwiteshbera/Pixby
-2. Run docker-compose build to build the necessary images for the project.
-3. Make sure you have filled the environment variables in the docker-compose.yml file before running docker-compose up 
+1. Clone the repository from `https://github.com/rwiteshbera/Pixby`
+2. Make sure you have filled the environment variables in the docker-compose.yml file before running docker-compose up 
 ```js
    MONGO_URI= // mongodb://mongo:27017/pixby
    SENDER_EMAIL= // It will be used in nodemailer for email service. 
@@ -37,10 +36,10 @@ Once you have these prerequisites, you can follow these steps to set up the proj
    CLOUDINARY_API_SECRET= // Add Cloudinary secret keys.
    SERVER_BASE_URL= // http://localhost:5050
 ```
-
-4. Run docker-compose up to start the project.
-5. Access the client at http://localhost:3000 and the server at http://localhost:5050 (Default PORT)
-6. To stop the project, press CTRL + C in the terminal where the project is running and run docker-compose down to stop and remove the containers.
+3. Run `docker-compose build` to build the necessary images for the project.
+4. Run `docker-compose up` to start the project.
+5. Access the client at `http://localhost:3000` and the server at `http://localhost:5050` (Default PORT)
+6. To stop the project, press CTRL + C in the terminal where the project is running and run `docker-compose down` to stop and remove the containers.
 
 ## Our Contributors
 
