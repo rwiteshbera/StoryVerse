@@ -36,12 +36,11 @@ const ForgetPassword = () => {
         { email },
         axiosConfig
       );
-
       toast({
         position: "bottom-left",
         render: () => (
           <Box color="white" p={3} bg="blue.500">
-            Reset link has been sent to your email.
+            {data.message}
           </Box>
         ),
       });

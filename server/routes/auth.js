@@ -160,7 +160,8 @@ router.post("/reset_password", (req, res) => {
   User.findOne({ email: email })
     .then((savedUser) => {
       if (!savedUser) {
-        return res.json("Email is not registered yet.");
+        res.json({message : "Email is not registered yet."});
+        return
       }
 
       const secret = savedUser.password;
@@ -194,14 +195,16 @@ router.post("/reset_password", (req, res) => {
         })
         .sendMail(message, (err) => {
           if (err) {
-            return res.json(err);
+            res.json({message : "Internal Server Error"});
+            return
           } else {
-            return res.json("Password reset link has been sent to your email.");
+            res.json({message : "Password reset link has been sent to your email."});
+            return
           }
         });
     })
     .catch((e) => {
-      return res.status(422).json({ error: e });
+      return res.status(422).json({ message: e });
     });
 });
 

@@ -18,6 +18,13 @@ module.exports = (req, res, next) => {
     const { _id } = jwt_decode(token);
 
     User.findById(_id).then((userData) => {
+      if (!userData) {
+        res.status(401).json({
+          error: "You must be logged in",
+        });
+        next();
+      }
+
       jwt.verify(token, userData.password, (err) => {
         if (err) {
           return res.status(401).json({
