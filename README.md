@@ -25,12 +25,11 @@
 ## Installation
 Once you have these prerequisites, you can follow these steps to set up the project:
 
-1. Clone the repository from `https://github.com/rwiteshbera/Pixby`
+1. Clone the repository from https://github.com/rwiteshbera/Pixby
 2. Run docker-compose build to build the necessary images for the project.
 3. Copy the .env.example file to .env and update any details required in both `server` and `client` foler.
-
-4. Run docker-compose up to start the project.
-5. Access the client at `http://localhost:3000` and the server at `http://localhost:5050` (Default PORT)
+4. Run `docker-compose up` to start the project.
+5. Access the client at http://localhost:3000 and the server at http://localhost:5050 (Default PORT)
 6. To stop the project, press CTRL + C in the terminal where the project is running and run docker-compose down to stop and remove the containers.
 
 ## Our Contributors
