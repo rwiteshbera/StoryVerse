@@ -16,6 +16,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signUpMode, setSignUpMode] = useState(false);
+  const [message, setMessage] = useState("");
 
   // Signup State
   const [name, setName] = useState("");
@@ -33,7 +34,7 @@ const Login = () => {
       return;
     } else {
       try {
-        console.log("Logging")
+        console.log("Logging");
         const { data } = await axios.post(
           "/signin",
           { email, password },
@@ -74,7 +75,7 @@ const Login = () => {
       if (!name || !username || !email || !password) {
         return;
       }
-      console.log("Posting")
+      console.log("Posting");
 
       const { data } = await axios.post(
         "/signup",
@@ -82,7 +83,7 @@ const Login = () => {
         axiosConfig
       );
 
-      console.log(JSON.stringify(data));
+      setMessage(data.message);
       // navigate("/");
 
       Notification.requestPermission().then((perm) => {
@@ -93,10 +94,10 @@ const Login = () => {
     } catch (error) {
       console.log("ERROR" + error);
     } finally {
-      setName("");
-      setUsername("");
-      setEmail("");
-      setPassword("");
+        setName("");
+        setUsername("");
+        setEmail("");
+        setPassword("");
     }
   };
 
@@ -190,6 +191,7 @@ const Login = () => {
               <button onClick={Signup} type="submit" className="btn signup">
                 Sign Up
               </button>
+              <h1>{message}</h1>
             </div>
           </div>
         </div>

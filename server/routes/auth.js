@@ -34,7 +34,7 @@ router.post("/signup", (req, res) => {
         if (savedUser) {
           return res
             .status(422)
-            .json({ error: "User already exists with that email" });
+            .json({ message: "User already exists with that email" });
         }
 
         // Create new user and store it in the database

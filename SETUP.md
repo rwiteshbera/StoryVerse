@@ -5,19 +5,7 @@
 bash setup.sh
 ```
 
-- Create a `.env` file inside `server` folder. Copy the following code
-  snippet add all the secret keys.
-
-```js
-MONGO_URI=
-SENDER_EMAIL=
-SENDER_EMAIL_PASS=
-CLOUDINARY_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-SERVER_BASE_URL=
-```
-
+- Copy the .env.example file to .env and update any details required in both `server` and `client` foler.
 1. **MONGO_URI** : You will get mongodb uri once you create a database. URI
    helps to define connections between applications and MongoDB instances.For
    testing purposes, you can use `"mongodb://localhost:27017"`
