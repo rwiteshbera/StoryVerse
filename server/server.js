@@ -1,43 +1,40 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
 const cors = require("cors");
-const cloudinary = require('cloudinary').v2;
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+require("dotenv").config();
 
+app.disable("x-powered-by");
+app.use(helmet());
+app.use(express.json());
 
-const dotenv = require('dotenv').config()
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+  })
+);
 
+const PORT = process.env.HOST_PORT || 5050;
 
-const MONGO_URI = process.env.MONGO_URI;
-const PORT = 5050 || process.env.CLIENT_PORT_ID;
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.use(cors())
-
-
-// Database configuration
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-mongoose.connection.on("connected", () => {
-  console.log("Connected to mongodb!");
-});
-mongoose.connection.on("error", (err) => {
-  console.log("ERROR! Cannot connect to database ", err);
-});
+// Connect MongoDB
+require("./database/mongodb");
 
 // Database Schema
 require("./models/user");
 require("./models/post");
 
-
-app.use(express.json());
-
 // React Router
-app.use(require("./routes/auth"));
+app.use(require("./routes/authentication"));
+app.use(require("./routes/forgotPassword"));
 app.use(require("./routes/post"));
 app.use(require("./routes/user"));
-app.use(require("./routes/settings"))
+app.use(require("./routes/settings"));
 
 app.listen(PORT, () => {
   console.log(`Server is listening at: http://localhost:${PORT}/`);

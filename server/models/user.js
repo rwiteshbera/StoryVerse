@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const dotenv = require('dotenv').config()
 
 CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
 
@@ -29,11 +28,11 @@ const userSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    default: "Prefer not to say",
+    default: "",
   },
   following: [{ type: ObjectId, ref: "User" }],
   followers: [{ type: ObjectId, ref: "User" }],
-  loggedInActivity: [{ type: String, required: true }],
+  logInActivity: [{ type: String, required: true }],
   isDeactivated: {
     type: Boolean,
     default: false,

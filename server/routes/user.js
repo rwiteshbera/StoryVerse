@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
-const requireLogin = require("../middleware/requireLogin");
+const requireLogin = require("../middleware/authorization");
 
 // Cloudinary Setup
 const cloudinary = require("cloudinary").v2;

@@ -5,7 +5,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
-const requireLogin = require("../middleware/requireLogin");
+const requireLogin = require("../middleware/authorization");
 
 // Change your name and gender
 router.post("/settings/edit&profile/name&gender", requireLogin, (req, res) => {
