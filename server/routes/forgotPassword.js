@@ -5,139 +5,167 @@ const User = mongoose.model("User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const {
+  generateHashpassword,
+  validateHashpassword,
+} = require("../utils/bcrypt");
 
-SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS;
-SENDER_EMAIL = process.env.SENDER_EMAIL;
-SERVER_BASE_URL = process.env.SERVER_BASE_URL;
+const SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS;
+const SENDER_EMAIL = process.env.SENDER_EMAIL;
+const SECRET_KEY = process.env.JWT_SECRET;
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
-// Forgot Password // Send a special Link to email
-router.post("/forgot_password", (req, res) => {
+// Forgot Password // Send a special token to email
+router.post("/v1/forgot_password", async (req, res) => {
   const { email } = req.body;
 
-  User.findOne({ email: email })
-    .then((savedUser) => {
-      if (!savedUser) {
-        res.json({ message: "Email is not registered yet." });
-        return;
-      }
+  if (!email) {
+    return res.status(422).json({ message: "no email found" });
+  }
 
-      const secret = savedUser.password;
+  try {
+    // Find the user data using email
+    const savedUser = await User.findOne({ email: email });
 
-      const payload = {
-        email: email,
-        id: savedUser._id,
-      };
+    // Check if user exists or not
+    if (!savedUser) {
+      return res.status(422).json({ message: "no user found with this email" });
+    }
 
-      const token = jwt.sign(payload, secret, { expiresIn: "15m" }); // Special link will be expired after 15 min
+    // Create a user payload
+    const payload = {
+      id: savedUser._id,
+      email: savedUser.email,
+      username: savedUser.username,
+    };
 
-      // This is the special link that will be used to reset user password
-      const special_link = `${SERVER_BASE_URL}/reset_password/${savedUser._id}/${token}`;
+    // Generate a special JWT
+    const specialToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "15m" });
 
-      const message = {
-        from: SENDER_EMAIL,
-        to: email,
-        subject: "Reset your password",
-        text: `Reset Link (Valid for 15 minutes): ${special_link}`,
-      };
+    // Createa a reset link
+    const resetLink = `${CLIENT_ORIGIN}/passwordReset?token=${specialToken}&username=${savedUser.username}`;
 
-      nodemailer
-        .createTransport({
-          service: "gmail",
-          auth: {
-            user: SENDER_EMAIL,
-            pass: SENDER_EMAIL_PASS,
-          },
-          port: 465,
-          host: "smtp.gmail.com",
-        })
-        .sendMail(message, (err) => {
-          if (err) {
-            res.json({ message: "Internal Server Error" });
-            return;
-          } else {
-            res.json({
-              message: "Password reset link has been sent to your email.",
-            });
-            return;
-          }
-        });
-    })
-    .catch((e) => {
-      return res.status(422).json({ message: e });
-    });
+    // Create a email
+    const message = {
+      from: SENDER_EMAIL,
+      to: email,
+      subject: "Reset your password",
+      text: `Reset Token (Valid for 15 minutes): \n ${resetLink}`,
+    };
+
+    // Send the email to the user
+    nodemailer
+      .createTransport({
+        service: "gmail",
+        auth: {
+          user: SENDER_EMAIL,
+          pass: SENDER_EMAIL_PASS,
+        },
+        port: 465,
+        host: "smtp.gmail.com",
+      })
+      .sendMail(message, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Internal Server Error" });
+        } else {
+          console.log(specialToken);
+          return res.status(200).json({
+            message: "Password reset link has been sent to your email.",
+          });
+        }
+      });
+  } catch (error) {
+    return res.status(500).json({ errror: error });
+  }
 });
 
-// Redirect to forgot password page after reset link validation
-router.get("/forgot_password/:id/:token", (req, res) => {
-  let { id, token } = req.params;
+// Reset link validation
+router.get("/v1/forgot_password", async (req, res) => {
+  let { token, username } = req.query;
 
-  // Check id whether it exists or not
-  // Link validation
-  // Dot(.) and Hyphen(-) will not work in browser address path, hence we are replacing it with underscore(_dot_) and (_hyp_).
+  try {
+    const savedUser = await User.findOne({ username: username });
 
-  User.findOne({ _id: id })
-    .then((savedUser) => {
-      if (!savedUser) {
-        return res.send("User not found");
+    if (!savedUser) {
+      return res.status(422).json({ error: "invalid link" });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, payload) => {
+      if (err) {
+        return res.status(422).json({ error: "token has been expired" });
       }
-      const secret = savedUser.password;
 
-      try {
-        const payload = jwt.verify(token, secret);
-        token = token.replaceAll(".", "_dot_").replaceAll("-", "_hyp_");
-        return res
-          .status(301)
-          .redirect(`http://localhost:3000/reset_password/${id}/${token}`);
-      } catch (error) {
-        return res.send("Invalid link");
+      if (payload.username !== username) {
+        return res.status(422).json({ error: "invalid link" });
       }
-    })
-    .catch((e) => {
-      return res.status(422).json({ error: e });
+
+      generateHashpassword(payload.id)
+        .then((reset_id) => {
+          res.cookie("reset_id", reset_id, {
+            secure: true,
+            httpOnly: true,
+            expiresIn: 1000 * 60 * 5, // 5 Minutes
+          });
+
+          res.status(200).json({ username, status: "ok" });
+        })
+        .catch((err) => {
+          return res.status(422).json({ error: err });
+        });
     });
+  } catch (error) {
+    return res.status(422).json({ error: error });
+  }
 });
 
 // If user click on forgot password button after giving new password
-router.post("/forgot_password/:id/:token", (req, res) => {
-  let { id, token } = req.params;
-  let { newPassword } = req.body;
-  // Check id whether it exists or not
-  // Link validation
-  // Dot(.) and Hyphen(-) will not work in browser address path, hence we are replacing it with underscore(_dot_) and (_hyp_).
-  token = token.replaceAll("_dot_", ".").replaceAll("_hyp_", "-");
+router.post("/v1/reset_password", async (req, res) => {
+  let reset_id = req.cookies.reset_id;
 
-  User.findOne({ _id: id })
-    .then((savedUser) => {
-      if (!savedUser) {
-        return res.json("Invalid reset link");
-      }
-      const secret = savedUser.password;
+  let { username, newPassword } = req.body;
 
-      try {
-        const payload = jwt.verify(token, secret);
-        // return res.json({payload: payload})
+  if (!reset_id || !username || !newPassword) {
+    return res.status(422).json({ error: "unable to update password" });
+  }
 
-        bcrypt.hash(newPassword, 16).then((hashedPassword) => {
-          User.findByIdAndUpdate(
-            payload.id,
-            { password: hashedPassword },
-            { new: true },
-            (err, result) => {
-              if (err) {
-                return res.status(422).json({ error: err });
-              } else {
-                return res.json({ message: "Password updated successfully." });
-              }
-            }
-          );
-        });
-      } catch (e) {
-        return res.send("Invalid link");
-      }
-    })
-    .catch((e) => {
-      return res.status(422).json({ error: e });
-    });
+  try {
+    const savedUser = await User.findOne({ username: username });
+    if (!savedUser) {
+      return res.status(422).json({ error: "unable to update password" });
+    }
+
+    const isValidResetId = await validateHashpassword(
+      savedUser._id.valueOf(),
+      reset_id
+    );
+
+    if (!isValidResetId) {
+      return res.status(422).json({ error: "unable to update password" });
+    }
+
+    // Hash the password
+    let hashedPassword = await generateHashpassword(newPassword);
+
+    if (!hashedPassword) {
+      return res.status(500).json({
+        error: "unable to update password",
+      });
+    }
+
+    const result = await User.findByIdAndUpdate(
+      { _id: savedUser._id },
+      { password: hashedPassword }
+    );
+
+    if (!result) {
+      return res.status(422).json({ error: "unable to update password" });
+    }
+    res.clearCookie("reset_id");
+    return res.status(200).json({ message: "password updated successfully" });
+  } catch (error) {
+    return res.status(422).json({ error: "unable to update password" });
+  }
 });
 
 module.exports = router;

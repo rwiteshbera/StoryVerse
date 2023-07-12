@@ -1,13 +1,12 @@
 const bcrypt = require("bcryptjs");
 
 // Encrypt Password using bcrypt package
-const generateHashpassword = async (originalPassword) => {
+const generateHashpassword = async (originalPassword, salt = 10) => {
   try {
-    const hashPassword = await bcrypt.hash(originalPassword, 10);
+    const hashPassword = await bcrypt.hash(originalPassword, salt);
     return hashPassword;
   } catch (err) {
-    console.error(err);
-    return "";
+    throw new Error(err);
   }
 };
 
@@ -17,8 +16,7 @@ const validateHashpassword = async (originalPassword, hashPassword) => {
     const isValid = await bcrypt.compare(originalPassword, hashPassword);
     return isValid;
   } catch (err) {
-    console.error(err);
-    return false;
+    throw new Error(err);
   }
 };
 

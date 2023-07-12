@@ -228,11 +228,11 @@ router.post("/search", (req, res) => {
 router.get("/v1/following", authorization, async (req, res) => {
   const { username } = req.body;
   try {
-    const loginUser = await User.findOne({ username: username }).exec();
-    if (!loginUser) {
+    const user = await User.findOne({ username: username }).exec();
+    if (!user) {
       return res.status(422).json({ error: "failed to fetch data" });
     }
-    const followingList = await User.find({ _id: loginUser.following })
+    const followingList = await User.find({ _id: user.following })
       .select("-_id name username profilePhoto")
       .exec();
     return res.status(200).json({ following: followingList });
@@ -245,11 +245,11 @@ router.get("/v1/following", authorization, async (req, res) => {
 router.get("/v1/followers", authorization, async (req, res) => {
   const { username } = req.body;
   try {
-    const loginUser = await User.findOne({ username: username }).exec();
-    if (!loginUser) {
+    const user = await User.findOne({ username: username }).exec();
+    if (!user) {
       return res.status(422).json({ error: "failed to fetch data" });
     }
-    const followingList = await User.find({ _id: loginUser.followers })
+    const followingList = await User.find({ _id: user.followers })
       .select("-_id name username profilePhoto")
       .exec();
     return res.status(200).json({ followers: followingList });
