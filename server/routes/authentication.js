@@ -20,13 +20,14 @@ router.get("/", (req, res) => {
 });
 
 // Signup process
-router.post("/signup", async (req, res) => {
+router.post("/v1/signup", async (req, res) => {
   // Check where the user has filled all the required fields
   const { name, username, email, password } = req.body;
   if (!name || !username || !email || !password) {
     return res.status(422).json({ error: "Please fill all the fields" });
   }
 
+  // Validate Email
   if (!emailValidator.validate(email)) {
     return res.status(400).json({ message: "Please provide valid email" });
   }
@@ -76,9 +77,9 @@ router.post("/signup", async (req, res) => {
     });
 });
 
-// Signin process // Login Process
+// Login process // Login Process
 // [Email or Username + Password]
-router.post("/signin", async (req, res) => {
+router.post("/v1/login", async (req, res) => {
   const { email, password, username } = req.body;
 
   // Fetch user platform details
@@ -174,7 +175,7 @@ router.post("/signin", async (req, res) => {
   const expiryDays = 1000 * 60 * 60 * 24 * 7; // 7 days
 
   // Store JWT token in cookie
-  res.cookie("jwt", `Bearer ${token}`, {
+  res.cookie("authorization", `Bearer ${token}`, {
     secure: true,
     httpOnly: true,
     maxAge: expiryDays,

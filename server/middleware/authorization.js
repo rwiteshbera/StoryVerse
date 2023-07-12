@@ -4,41 +4,28 @@ const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
 const User = mongoose.model("User");
 
+const secretKey = process.env.JWT_SECRET;
+
 module.exports = (req, res, next) => {
   try {
-    const authorization = req.headers.authorization;
+    const authorization = req.cookies.authorization;
+
     // authorization === Bearer JSON_WEBTOKEN
     if (!authorization) {
-      console.log("Authorization Failed");
       return res.status(401).json({ error: "Authorization failed" });
     }
 
-    const token = req.headers.authorization.split(" ")[1];
+    const token = authorization.split(" ")[1];
 
-    const { _id } = jwt_decode(token);
-
-    User.findById(_id).then((userData) => {
-      if (!userData) {
-        res.status(401).json({
-          error: "You must be logged in",
-        });
-        next();
+    jwt.verify(token, secretKey, (error, payload) => {
+      if (error) {
+        res.status(401).json({ message: error });
+        return;
       }
-
-      jwt.verify(token, userData.password, (err) => {
-        if (err) {
-          return res.status(401).json({
-            error: "You must be logged in",
-            err,
-            token,
-          });
-        }
-        req.user = userData;
-        next();
-      });
+      req.user = payload;
+      next();
     });
   } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: "Authorization failed" });
+    return res.status(401).json({ error: "Authorization failed" });
   }
 };

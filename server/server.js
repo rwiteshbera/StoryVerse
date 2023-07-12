@@ -6,10 +6,6 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 require("dotenv").config();
 
-app.disable("x-powered-by");
-app.use(helmet());
-app.use(express.json());
-
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN,
@@ -17,10 +13,13 @@ app.use(
   })
 );
 
-const PORT = process.env.HOST_PORT || 5050;
-
+app.disable("x-powered-by");
+app.use(helmet());
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+const PORT = process.env.HOST_PORT || 5050;
 
 // Connect MongoDB
 require("./database/mongodb");

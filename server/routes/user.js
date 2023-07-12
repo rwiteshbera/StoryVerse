@@ -3,14 +3,13 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
 const User = mongoose.model("User");
-const requireLogin = require("../middleware/authorization");
+const authorization = require("../middleware/authorization");
 
 // Cloudinary Setup
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
 const DataUriParser = require("datauri/parser");
-const dotenv = require('dotenv').config()
 
 const parser = new DataUriParser();
 
@@ -24,29 +23,33 @@ cloudinary.config({
 // Cloudinary Setup
 
 // fetch logged-in user data
-router.get("/me", requireLogin, (req, res) => {
-  const {
-    _id,
-    name,
-    username,
-    email,
-    gender,
-    followers,
-    following,
-    profilePhoto,
-    loggedInActivity,
-  } = req.user;
-  return res.json({
-    _id,
-    name,
-    username,
-    email,
-    gender,
-    followers,
-    following,
-    profilePhoto,
-    loggedInActivity,
-  });
+router.get("/v1/user", authorization, async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const data = await User.findById(_id).exec();
+    const {
+      name,
+      username,
+      email,
+      profilePhoto,
+      gender,
+      following,
+      followers,
+    } = data;
+    return res.status(200).json({
+      message: {
+        name,
+        username,
+        email,
+        profilePhoto,
+        gender,
+        following,
+        followers,
+      },
+    });
+  } catch (err) {
+    return res.status(422).json({ error: err });
+  }
 });
 
 const upload = multer();
@@ -54,7 +57,7 @@ const upload = multer();
 router.patch(
   "/change_profile_pic",
   upload.single("file"),
-  requireLogin,
+  authorization,
   (req, res) => {
     if (!req.file) {
       return res.json({ message: "No image found" });
@@ -94,80 +97,86 @@ router.patch(
 );
 
 // See other user's profile
-router.get("/user/:id", requireLogin, (req, res) => {
-  User.findOne({ _id: req.params.id })
-    .select("-password") // Get all the fields except password
-    .then((user) => {
-      Post.find({ postedBy: req.params.id })
-        .populate("postedBy", "_id name")
-        .exec((err, posts) => {
-          if (err) {
-            return res.status(422).json({ error: err });
-          }
-          res.json({ user, posts });
-        });
-    })
-    .catch((err) => {
-      return res.status(404).json({ error: "User not found." });
-    });
+router.get("/v1/user/:username", authorization, async (req, res) => {
+  const username = req.params.username;
+
+  try {
+    const userData = await User.findOne(
+      { username },
+      "-email -password -logInActivity -isDeactivated" // Get all the fields except these
+    ).exec();
+
+    if (userData == null) {
+      return res.status(401).json({ data: "no user found" });
+    }
+
+    const posts = await Post.find({ postedBy: userData._id })
+      .populate("postedBy", "_id username")
+      .exec();
+
+    return res.status(200).json({ data: userData, posts: posts });
+  } catch (err) {
+    return res.status(422).json({ error: err });
+  }
 });
 
 // Follow users
-router.put("/follow", requireLogin, (req, res) => {
-  User.findByIdAndUpdate(
-    req.body.followId,
-    {
-      $addToSet: { followers: req.user._id },
-    },
-    { new: true }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    }
-    User.findByIdAndUpdate(
-      req.user._id,
+router.put("/v1/follow", authorization, async (req, res) => {
+  const { username } = req.body;
+  try {
+    const followedUser = await User.findOneAndUpdate(
+      { username: username },
       {
-        $addToSet: { following: req.body.followId },
+        $addToSet: { followers: req.user._id },
       },
       { new: true }
-    )
-      .then((result) => {
-        const { password, ...rest } = result;
-        return res.json(rest._doc);
-      })
-      .catch((err) => {
-        return res.status(422).json({ error: err });
-      });
-  });
+    ).exec();
+
+    if (followedUser) {
+      var you = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          $addToSet: { following: followedUser._id },
+        },
+        { new: true }
+      )
+        .select("-_id following followers")
+        .exec();
+    }
+    return res.status(200).json({ data: you });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to follow the user." });
+  }
 });
 
 // Unfollow users
-router.put("/unfollow", requireLogin, (req, res) => {
-  User.findByIdAndUpdate(
-    req.body.unfollowId,
-    {
-      $pull: { followers: req.user._id },
-    },
-    { new: true }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    }
-    User.findByIdAndUpdate(
-      req.user._id,
+router.put("/v1/unfollow", authorization, async (req, res) => {
+  const { username } = req.body;
+  try {
+    const unfollowedUser = await User.findOneAndUpdate(
+      { username: username },
       {
-        $pull: { following: req.body.unfollowId },
+        $pull: { followers: req.user._id },
       },
       { new: true }
-    )
-      .then((result) => {
-        const { password, ...rest } = result;
-        return res.json(rest._doc);
-      })
-      .catch((err) => {
-        return res.status(422).json({ error: err });
-      });
-  });
+    ).exec();
+
+    if (unfollowedUser) {
+      var you = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+          $pull: { following: unfollowedUser._id },
+        },
+        { new: true }
+      )
+        .select("-_id following followers")
+        .exec();
+    }
+
+    return res.status(200).json({ data: you });
+  } catch (error) {
+    res.status(500).json({ error: err });
+  }
 });
 
 // search user
@@ -176,7 +185,7 @@ router.post("/search", (req, res) => {
   let pattern = new RegExp("^" + req.body.query, "i");
 
   User.find({ name: { $regex: pattern } })
-    .select("-password")
+    .select("_id, -password")
     .then((user) => {
       return res.json({ user });
     })
@@ -186,27 +195,37 @@ router.post("/search", (req, res) => {
 });
 
 // Get following users list
-router.post("/get_following", requireLogin, (req, res) => {
-  User.find({ _id: req.body.following })
-    .select("-password") // Get all the fields except password
-    .then((users) => {
-      res.json({ users });
-    })
-    .catch((err) => {
-      return res.status(404).json({ error: "User not found." });
-    });
+router.get("/v1/following", authorization, async (req, res) => {
+  const { username } = req.body;
+  try {
+    const loginUser = await User.findOne({ username: username }).exec();
+    if (!loginUser) {
+      return res.status(422).json({ error: "failed to fetch data" });
+    }
+    const followingList = await User.find({ _id: loginUser.following })
+      .select("-_id name username profilePhoto")
+      .exec();
+    return res.status(200).json({ following: followingList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 });
 
 // Get followers list
-router.post("/get_followers", requireLogin, (req, res) => {
-  User.find({ _id: req.body.followers })
-    .select("-password") // Get all the fields except password
-    .then((users) => {
-      res.json({ users });
-    })
-    .catch((err) => {
-      return res.status(404).json({ error: "User not found." });
-    });
+router.get("/v1/followers", authorization, async (req, res) => {
+  const { username } = req.body;
+  try {
+    const loginUser = await User.findOne({ username: username }).exec();
+    if (!loginUser) {
+      return res.status(422).json({ error: "failed to fetch data" });
+    }
+    const followingList = await User.find({ _id: loginUser.followers })
+      .select("-_id name username profilePhoto")
+      .exec();
+    return res.status(200).json({ followers: followingList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 });
 
 module.exports = router;
