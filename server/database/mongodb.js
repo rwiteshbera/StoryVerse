@@ -3,10 +3,6 @@ const mongoose = require("mongoose");
 const MONGO_URI = process.env.MONGO_URI;
 const MONGO_DATABASE_NAME = process.env.MONGO_DATABASE_NAME;
 
-mongoose.createConnection(MONGO_URI, {
-  dbName: MONGO_DATABASE_NAME,
-  family: 4,
-});
 mongoose
   .connect(process.env.MONGO_URI, { dbName: MONGO_DATABASE_NAME, family: 4 })
   .then((res) => {

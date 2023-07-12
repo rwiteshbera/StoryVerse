@@ -52,19 +52,33 @@ router.get("/v1/user", authorization, async (req, res) => {
   }
 });
 
-const upload = multer();
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 // Change your profile Photo
 router.patch(
-  "/change_profile_pic",
+  "/v1/profile-photo/change",
   upload.single("file"),
   authorization,
-  (req, res) => {
+  async (req, res) => {
     if (!req.file) {
-      return res.json({ message: "No image found" });
+      return res.status(422).json({ message: "no image found" });
+    }
+
+    const _id = req.user._id;
+    if (!_id) {
+      return res.status(500).json({ error: "unable to change photo" });
     }
 
     const extname = path.extname(req.file.originalname).toString();
     const file64 = parser.format(extname, req.file.buffer);
+
+    if (extname !== ".jpeg" && fileExt !== ".png" && fileExt !== ".jpg") {
+      response
+        .status(415)
+        .json({ message: "only jpeg, jpg, png files are allowed" });
+      return;
+    }
     // Use the uploaded file's name as the asset's public ID and
     // allow overwriting the asset with new versions
     const options = {
@@ -73,26 +87,42 @@ router.patch(
       overwrite: true,
     };
 
-    cloudinary.uploader
-      .upload(file64.content, options)
-      .then((data) => {
-        User.findByIdAndUpdate(
-          req.user._id,
-          { profilePhoto: data.secure_url },
-          { new: true },
-          (err, result) => {
-            if (err) {
-              return res.status(422).json({ error: err });
-            } else {
-              // console.log(result)
-              return res.json({ message: result });
-            }
-          }
-        );
-      })
-      .catch((e) => {
-        return res.status(422).json({ error: e });
+    try {
+      // Upload image to cloudinary
+      const cloudinaryResponse = await cloudinary.uploader.upload(
+        file64.content,
+        options
+      );
+
+      if (!cloudinaryResponse) {
+        return res.status(422).json({ error: "unable to change photo" });
+      }
+
+      // Get Userdata
+      const userdata = await User.findById(_id);
+
+      if (!userdata) {
+        return res.status(422).json({ error: "unable to change photo" });
+      }
+
+      // Extract Public Id of Previous Image from URL
+      const publicIdToDelete = userdata.profilePhoto.substring(
+        userdata.profilePhoto.lastIndexOf("/") + 1,
+        userdata.profilePhoto.lastIndexOf(".")
+      );
+
+      // Update Image URL in MongoDatabase
+      const data = await User.findByIdAndUpdate(_id, {
+        profilePhoto: cloudinaryResponse.secure_url,
       });
+
+      // Remove Previous Image From Cloudinary
+      await cloudinary.uploader.destroy(publicIdToDelete);
+
+      return res.status(200).json({ message: data.profilePhoto });
+    } catch (error) {
+      return res.status(500).json({ error: "unable to change photo" });
+    }
   }
 );
 
