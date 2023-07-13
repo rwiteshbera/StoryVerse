@@ -73,7 +73,7 @@ router.patch(
     const extname = path.extname(req.file.originalname).toString();
     const file64 = parser.format(extname, req.file.buffer);
 
-    if (extname !== ".jpeg" && fileExt !== ".png" && fileExt !== ".jpg") {
+    if (extname !== ".jpeg" && extname !== ".png" && extname !== ".jpg") {
       response
         .status(415)
         .json({ message: "only jpeg, jpg, png files are allowed" });

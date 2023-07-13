@@ -2,18 +2,18 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
-const requireLogin = require("../middleware/authorization");
+const User = mongoose.model("User");
+const authorization = require("../middleware/authorization");
 
 // Cloudinary Setup
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
 const DataUriParser = require("datauri/parser");
-const dotenv = require('dotenv').config()
 
-CLOUDINARY_NAME = process.env.CLOUDINARY_NAME
-CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
-CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
+CLOUDINARY_NAME = process.env.CLOUDINARY_NAME;
+CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 const parser = new DataUriParser();
 
@@ -27,71 +27,92 @@ cloudinary.config({
 // Cloudinary Setup
 
 // Get the posts of the users you follow in homepage
-router.get("/feedPosts", requireLogin, (req, res) => {
-  Post.find({ postedBy: { $in: req.user.following } })
-    .populate("postedBy", "name email profilePhoto")
-    .then((posts) => {
-      res.json({ posts: posts });
+router.get("/v1/feed", authorization, async (req, res) => {
+  try {
+    const loginUserData = await User.findOne({ _id: req.user._id });
+
+    const feedPosts = await Post.find({
+      postedBy: { $in: loginUserData.following },
     })
-    .catch((err) => {
-      console.log(err);
-    });
+      .select("-_id")
+      .populate("postedBy", "-_id username profilePhoto");
+
+    return res.json(feedPosts);
+  } catch (error) {
+    return res.status(500).json({ error: "failed to load posts" });
+  }
 });
 
 const upload = multer();
 // Upload new image on socials
-router.post("/upload", upload.single("file"), requireLogin, (req, res) => {
-  if (!req.body.file && !req.body.captions) {
-    return res.json({ message: "Input field shouldn't be empty." });
-  }
-  const extname = path.extname(req.file.originalname).toString();
-  const file64 = parser.format(extname, req.file.buffer);
-  // Use the uploaded file's name as the asset's public ID and
-  // allow overwriting the asset with new versions
-  const options = {
-    use_filename: true,
-    unique_filename: false,
-    overwrite: true,
-  };
+router.post(
+  "/v1/upload",
+  upload.single("file"),
+  authorization,
+  async (req, res) => {
+    if (!req.file && !req.body.captions) {
+      return res.json({ message: "Input field shouldn't be empty." });
+    }
 
-  cloudinary.uploader
-    .upload(file64.content, options)
-    .then((data) => {
+    const extname = path.extname(req.file.originalname).toString();
+    const file64 = parser.format(extname, req.file.buffer);
+
+    if (extname !== ".jpeg" && extname !== ".png" && extname !== ".jpg") {
+      response
+        .status(415)
+        .json({ message: "only jpeg, jpg, png files are allowed" });
+      return;
+    }
+    // Use the uploaded file's name as the asset's public ID and
+    // allow overwriting the asset with new versions
+    const options = {
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
+
+    try {
+      // Upload image to cloudinary
+      const cloudinaryResponse = await cloudinary.uploader.upload(
+        file64.content,
+        options
+      );
+
+      if (!cloudinaryResponse) {
+        return res.status(422).json({ error: "unable to post" });
+      }
+
       const post = new Post({
         captions: req.body.captions,
-        photo: data.secure_url,
+        photo: cloudinaryResponse.secure_url,
         postedBy: req.user,
       });
 
-      post
-        .save()
-        .then(() => {
-          res.json({ message: "Posted successfully" });
-        })
-        .catch((err) => {
-          res.status(401).json({ err });
-        });
-    })
-    .catch((e) => {
-      return res.status(422).json({ error: e });
-    });
-});
+      const uploadPhotoRes = await post.save();
+
+      return res.status(200).json({ message: uploadPhotoRes });
+    } catch (error) {
+      return res.status(500).json({ error: "unable to post" });
+    }
+  }
+);
 
 // All the post created by the logged-in user
-router.get("/mypost", requireLogin, (req, res) => {
-  Post.find({ postedBy: req.user._id })
-    .then((myposts) => {
-      return res.json(myposts);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+router.get("/v1/user/posts", authorization, async (req, res) => {
+  try {
+    const posts = await Post.find({ postedBy: req.user._id });
+    return res.status(200).json({ message: posts });
+  } catch (error) {
+    return res.status(500).json({ error: "unable to load posts" });
+  }
 });
 
 // Like button
-router.put("/like", requireLogin, (req, res) => {
+router.put("/v1/like/check", authorization, (req, res) => {
+  let { id } = req.query;
+
   Post.findByIdAndUpdate(
-    req.body.postId,
+    id,
     {
       $addToSet: { likes: req.user._id },
     },
@@ -102,15 +123,16 @@ router.put("/like", requireLogin, (req, res) => {
     if (err) {
       return res.status(422).json({ error: err });
     } else {
-      return res.json(result);
+      return res.status(200).json({ message: result });
     }
   });
 });
 
-// Unlike button
-router.put("/unlike", requireLogin, (req, res) => {
+// Uncheck Like button
+router.put("/v1/like/uncheck", authorization, (req, res) => {
+  let { id } = req.query;
   Post.findByIdAndUpdate(
-    req.body.postId,
+    id,
     {
       $pull: { likes: req.user._id },
     },
@@ -121,31 +143,31 @@ router.put("/unlike", requireLogin, (req, res) => {
     if (err) {
       return res.status(422).json({ error: err });
     } else {
-      return res.json(result);
+      return res.status(200).json({ message: result });
     }
   });
 });
 
 // delete your own post
-router.delete("/delete/:postId", requireLogin, (req, res) => {
+router.delete("/v1/delete/post", authorization, (req, res) => {
   try {
-    const result = Post.findOne({ _id: req.params.postId })
+    Post.findOne({ _id: req.query.id })
       .populate("postedBy", "_id")
-      .exec((err, post) => {
-        if (err || !post) {
-          return console.log("ERROR");
+      .exec((error, post) => {
+        if (error || !post) {
+          return res.status(422).json({ message: error });
         }
         post
           .remove()
           .then((result) => {
-            return res.json(result);
+            return res.status(200).json({ message: result });
           })
           .catch((error) => {
-            console.log(error);
+            return res.status(422).json({ message: error });
           });
       });
   } catch (error) {
-    console.log(error);
+    return res.status(422).json({ message: error });
   }
 });
 
