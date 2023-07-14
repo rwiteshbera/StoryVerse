@@ -1,17 +1,39 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import App from "./App";
 import "./index.css";
-import { ChakraProvider } from "@chakra-ui/react";
-import axios from "axios";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-axios.defaults.baseURL = import.meta.env.VITE_SERVER_BASE_URL;
+// Components
 
+import Accounts from "./components/Account/Account";
+import Error from "./components/Error/Error";
+import Signup from "./components/Account/Signup/Signup";
+import App from "./App";
+import Profile from "./components/Profile/Profile";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Accounts />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: "signup",
+        element: <Signup />,
+      },
+    ],
+  },
+  {
+    path: "/home",
+    element: <App />,
+    children: [
+      {
+        path: "user",
+        element: <Profile />,
+      },
+    ],
+  },
+]);
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ChakraProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </ChakraProvider>
+  <RouterProvider router={router} />
 );

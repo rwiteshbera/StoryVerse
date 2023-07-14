@@ -1,168 +1,50 @@
 import React from "react";
-import "./Navbar.css";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { Center, Flex, Icon, Input } from "@chakra-ui/react";
-import { BsPlusCircle } from "react-icons/bs";
+import { ImHome } from "react-icons/im";
+import { FaBell } from "react-icons/fa";
+import { IoIosCreate } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
-import { AiOutlineHome } from "react-icons/ai";
-
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalBody,
-  useDisclosure,
-  List,
-  ListItem,
-  Image,
-  Text,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuGroup,
-  MenuItem,
-  Button,
-  MenuDivider,
-} from "@chakra-ui/react";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [SearchInput, setSearchInput] = useState();
-  const [SearchResult, setSearchResult] = useState([]);
-
-  let token = localStorage.getItem("token");
-  const logOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("id");
-    localStorage.removeItem("user_agent");
-  };
-
-  const axiosConfig = {
-    headers: {
-      "Content-type": "application/json",
-      responseType: "json",
-      Authorization: token,
-    },
-  };
-
-  const search = async (e) => {
-    setSearchInput(e.target.value);
-
-    onOpen();
-    try {
-      const { data } = await axios.post(
-        "/search",
-        { query: e.target.value },
-        axiosConfig
-      );
-      if (e.target.value === "") {
-        setSearchResult([]);
-      } else {
-        setSearchResult(data.user);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  let navigate = useNavigate();
 
   return (
-    <nav>
-      <Center bg="#fff" w="100%" p={4} color="black">
-        <Flex id="nav-mobile" className="">
-          <Link to="/" className="brand-logo left">
-            <Text fontSize="2xl" id="logoName">PixBy</Text>
-          </Link>
-          
-          <Input
-            type="text"
-            id="search_bar"
-            // onChange={search}
-            onClick={search}
-            onChange={search}
-            bg="#efefef"
-            marginLeft={"2vw"}
-            placeholder={"Search"}
-            value={SearchInput}
-            autoComplete={"off"}
+    <>
+      <div className="border-b pb-2 border-gray-600  grid grid-cols-5 items-center gap-x-5 ">
+        <input
+          className="col-span-3 px-4 py-2 m-1 rounded-2xl"
+          placeholder="Search user"
+        />
+        <div
+          className="flex flex-row justify-center items-center lg:gap-6 gap-2"
+          draggable="false"
+        >
+          <ImHome
+            className="hover:cursor-pointer hover:text-second" onClick={() => navigate("/home")}
+            size={24}
           />
-          <Flex margin={"0.2rem 2rem"}>
-            <li>
-              <Link to="/">
-                <AiOutlineHome fontSize={"1.5rem"} />
-              </Link>
-            </li>
-            <li>
-              <Link to="/create">
-                <BsPlusCircle fontSize={"1.5rem"} />
-              </Link>
-            </li>
-            <li>
-              <Menu>
-                <MenuButton>
-                  <CgProfile fontSize={"1.5rem"} />
-                </MenuButton>
-                <MenuList>
-                  <MenuGroup title="Profile">
-                    <Link to="/profile">
-                      <MenuItem>My Account</MenuItem>
-                    </Link>
-                    <Link to="/settings">
-                      <MenuItem>Settings</MenuItem>
-                    </Link>
-                    <Link to="/login">
-                      <MenuItem onClick={logOut}>Logout</MenuItem>
-                    </Link>
-                  </MenuGroup>
-                  <MenuDivider />
-                  <MenuGroup title="Help">
-                    <MenuItem>Docs</MenuItem>
-                    <MenuItem>FAQ</MenuItem>
-                  </MenuGroup>
-                </MenuList>
-              </Menu>
-            </li>
-          </Flex>
-        </Flex>
-      </Center>
-
-      {/* <SearchModal /> */}
-      <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalBody>
-            <Input
-              type="text"
-              onChange={search}
-              bg="#efefef"
-              placeholder={"Search"}
-              value={SearchInput}
-            />
-
-            <List spacing={3} marginTop={"2"} marginBottom={"2"}>
-              {SearchResult.map((item, key) => {
-                return (
-                  <Link to={`/profile/${item._id}`} key={key}>
-                    <ListItem>
-                      <Flex gap={"0 1rem"}>
-                        <Image
-                          src={item.profilePhoto}
-                          w={"30px"}
-                          borderRadius={"50%"}
-                        />
-                        <Text>{item.username}</Text>
-                      </Flex>
-                    </ListItem>
-                  </Link>
-                );
-              })}
-            </List>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </nav>
+          <FaBell
+            className="hover:cursor-pointer hover:text-second"
+            size={24}
+          />
+          <IoIosCreate
+            className="hover:cursor-pointer hover:text-second"
+            size={24}
+          />
+          <CgProfile
+            className="hover:cursor-pointer hover:text-second"
+            size={24}
+            onClick={() => navigate("/home/user")}
+          />
+        </div>
+        <p
+          className="text-center text-3xl m-1 select-none hover:cursor-pointer"
+          onClick={() => navigate("/home")}
+        >
+          PixBy
+        </p>
+      </div>
+    </>
   );
 };
 
