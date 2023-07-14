@@ -13,7 +13,7 @@ import Profile from "./components/Profile/Profile";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "*",
     element: <Accounts />,
     errorElement: <Error />,
     children: [
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/home",
+    path: "/home/*",
     element: <App />,
     children: [
       {

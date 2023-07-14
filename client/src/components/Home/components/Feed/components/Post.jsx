@@ -1,11 +1,14 @@
 import React from "react";
 import { AiOutlineHeart, AiOutlineComment } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
+import { useNavigate } from "react-router-dom";
 const Post = () => {
+  let navigate = useNavigate();
+
   return (
     <>
       <div className="flex flex-col p-2 border-b border-r border-gray-600">
-        <div className="flex flex-row items-center mx-4 gap-x-4 hover:cursor-pointer">
+        <div className="flex flex-row items-center mx-4 gap-x-4 hover:cursor-pointer" onClick={() => navigate("/home/user")}>
           <CgProfile size={32} />
           <p>Username</p>
         </div>

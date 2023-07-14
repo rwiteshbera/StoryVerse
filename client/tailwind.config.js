@@ -10,7 +10,6 @@ export default {
         third: "#00D7FF",
         fourth: "#72FFFF",
       },
-    }
+    },
   },
-  plugins: [],
 };

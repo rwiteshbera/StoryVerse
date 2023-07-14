@@ -16,12 +16,11 @@ const Accounts = () => {
           draggable="false"
         />{" "}
         <div className="flex flex-col items-center justify-center gap-y-2">
-          <div className="flex flex-col gap-y-2 h-96 w-80 border-2 justify-center items-center border-gray-600 rounded-md p-4 ">
+         
             <Routes>
               <Route index element={<Login title={AppTitle} />} />
               <Route path="/signup" element={<Signup title={AppTitle} />} />
             </Routes>
-          </div>
         </div>
       </div>
     </>
