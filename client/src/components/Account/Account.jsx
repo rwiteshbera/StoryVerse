@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import Images from "../../assets/images";
-import { Route, Routes} from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 
@@ -16,11 +16,10 @@ const Accounts = () => {
           draggable="false"
         />{" "}
         <div className="flex flex-col items-center justify-center gap-y-2">
-         
-            <Routes>
-              <Route index element={<Login title={AppTitle} />} />
-              <Route path="/signup" element={<Signup title={AppTitle} />} />
-            </Routes>
+          <Routes>
+            <Route index element={<Login title={AppTitle} />} />
+            <Route path="/signup" element={<Signup title={AppTitle} />} />
+          </Routes>
         </div>
       </div>
     </>

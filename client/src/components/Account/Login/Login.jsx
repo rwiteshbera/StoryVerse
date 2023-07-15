@@ -36,7 +36,7 @@ const Login = ({ title }) => {
       if (!data.success) {
         return console.log(data);
       }
-     console.log(data)
+     navigate('/home');
     } catch (error) {
       console.log(error?.response?.data.message);
     }

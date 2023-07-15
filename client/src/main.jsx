@@ -4,7 +4,6 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Components
-
 import Accounts from "./components/Account/Account";
 import Error from "./components/Error/Error";
 import Signup from "./components/Account/Signup/Signup";
@@ -13,7 +12,7 @@ import Profile from "./components/Profile/Profile";
 
 const router = createBrowserRouter([
   {
-    path: "*",
+    path: "/",
     element: <Accounts />,
     errorElement: <Error />,
     children: [
@@ -34,6 +33,7 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <RouterProvider router={router} />
 );

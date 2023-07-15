@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const Signup = ({ title }) => {
   let navigate = useNavigate();
@@ -17,7 +17,7 @@ const Signup = ({ title }) => {
   // Toast Message
   const notify = (message) => {
     toast(message);
-  }
+  };
 
   const axiosConfig = {
     headers: {
@@ -53,10 +53,10 @@ const Signup = ({ title }) => {
 
     try {
       const { data } = await axios.post("/v1/signup", signupState, axiosConfig);
-      if(!data.success) {
+      if (!data.success) {
         return console.log(data);
       }
-      console.log(data);
+      navigate("/");
     } catch (error) {
       console.log(error?.response?.data.message);
     }
