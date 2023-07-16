@@ -18,7 +18,6 @@ const App = () => {
           <Route path="/user" element={<Profile />} />
         </Routes>
       </div>
-      <Footer />
     </>
   );
 };
