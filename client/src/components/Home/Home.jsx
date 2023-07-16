@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import Feed from "./components/Feed/Feed";
 import User from "./components/User/User";
 import Suggested from "./components/Suggested/Suggested";
+import { useNavigate } from "react-router-dom";
+import useSWR from "swr";
 
 const Home = () => {
+  let navigate = useNavigate();
+
   return (
     <>
       <section className="grid grid-cols-4 gap-2 ">

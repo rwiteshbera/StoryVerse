@@ -5,6 +5,7 @@ const User = mongoose.model("User");
 const jwt = require("jsonwebtoken");
 const uaParser = require("ua-parser-js");
 const emailValidator = require("email-validator");
+const authorization = require("../middleware/authorization");
 
 const {
   generateHashpassword,
@@ -15,8 +16,11 @@ SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS;
 SENDER_EMAIL = process.env.SENDER_EMAIL;
 SERVER_BASE_URL = process.env.SERVER_BASE_URL;
 
-router.get("/", (req, res) => {
-  res.send("Hello from PixBy");
+router.get("/v1", authorization, (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ isAuthorized: false });
+  }
+  return res.status(200).json({ isAuthorized: true });
 });
 
 // Signup process
@@ -24,20 +28,20 @@ router.post("/v1/signup", async (req, res) => {
   // Check where the user has filled all the required fields
   const { name, username, email, password } = req.body;
   if (!name || !username || !email || !password) {
-    return res.status(422).json({ error: "Please fill all the fields" });
+    return res.status(200).json({ message: "Please fill all the fields" });
   }
 
   // Validate Email
   if (!emailValidator.validate(email)) {
-    return res.status(400).json({ message: "Please provide valid email" });
+    return res.status(200).json({ message: "Please provide valid email" });
   }
 
   // Hash the password
   let hashedPassword = await generateHashpassword(password);
 
   if (!hashedPassword) {
-    return res.status(500).json({
-      message: `Please try again`,
+    return res.status(503).json({
+      message: "Service unavailable, Try again",
     });
   }
 
@@ -46,12 +50,12 @@ router.post("/v1/signup", async (req, res) => {
     .then((savedUser) => {
       if (savedUser) {
         if (savedUser.email === email) {
-          return res
-            .status(422)
-            .json({ message: `User already exists with email: ${email}` });
+          return res.status(200).json({
+            message: `User already exists with ${email}`,
+          });
         } else if (savedUser.username === username) {
-          return res.status(422).json({
-            message: `User already exists with username: ${username}`,
+          return res.status(200).json({
+            message: `User already exists with ${username}`,
           });
         }
       }
@@ -66,10 +70,14 @@ router.post("/v1/signup", async (req, res) => {
       newUser
         .save()
         .then((user) => {
-          res.status(200).json({ message: "Account created successfully" });
+          res
+            .status(200)
+            .json({ success: "true", message: "Account created successfully" });
         })
         .catch((err) => {
-          res.status(422).json({ message: err });
+          res.status(200).json({
+            message: "Unable to create account. Try again.",
+          });
         });
     })
     .catch((err) => {
@@ -80,31 +88,24 @@ router.post("/v1/signup", async (req, res) => {
 // Login process // Login Process
 // [Email or Username + Password]
 router.post("/v1/login", async (req, res) => {
-  const { email, password, username } = req.body;
+  const { emailOrUsername, password } = req.body;
 
   // Fetch user platform details
   const userPlatform = uaParser(req.headers["sec-ch-ua-platform"]).ua;
 
   // Check where the user has filled all the required fields [Email or username & password]
-  if ((!email && !username) || !password) {
-    return res.status(422).json({ error: "Please fill all the fields" });
-  }
-
-  // Validate email id
-  if (email) {
-    if (!emailValidator.validate(email)) {
-      return res.status(400).json({ message: "Please provide valid email" });
-    }
+  if (!emailOrUsername || !password) {
+    return res.status(200).json({ message: "Please fill all the fields" });
   }
 
   // Check if user exists with this email or username
   const savedUser = await User.findOne({
-    $or: [{ email: email }, { username: username }],
+    $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
   });
 
   // If user doesn't exists, send a response
   if (!savedUser) {
-    return res.status(422).json({ error: "Invalid credentials" });
+    return res.status(200).json({ message: "Invalid credentials" });
   }
 
   // Validate Password
@@ -115,7 +116,7 @@ router.post("/v1/login", async (req, res) => {
 
   // If password is not correct
   if (!isValidPassword) {
-    return res.status(422).json({ error: "Invalid credentials" });
+    return res.status(200).json({ message: "Invalid credentials" });
   }
 
   // If password is valid, sign a jwt token
@@ -137,7 +138,7 @@ router.post("/v1/login", async (req, res) => {
       { new: true },
       (err, result) => {
         if (err) {
-          return res.status(422).json({
+          return res.status(503).json({
             message: "Unable to activate your account. Try again later.",
           });
         } else {
@@ -167,7 +168,7 @@ router.post("/v1/login", async (req, res) => {
     );
   } catch (err) {
     return res.status(500).json({
-      message: "Unable to save your activity. Try again later.",
+      message: err,
     });
   }
 
@@ -179,6 +180,7 @@ router.post("/v1/login", async (req, res) => {
     secure: true,
     httpOnly: true,
     maxAge: expiryDays,
+    sameSite: "none"
   });
 
   // Store username in cookie
@@ -190,14 +192,9 @@ router.post("/v1/login", async (req, res) => {
 
   // Send response
   return res.status(200).json({
+    success: true,
     name: savedUser.name,
     username: savedUser.name,
-    email: savedUser.email,
-    profilePhoto: savedUser.profilePhoto,
-    gender: savedUser.gender,
-    following: savedUser.following.length,
-    followers: savedUser.followers.length,
-    isDeactivated: savedUser.isDeactivated,
   });
 });
 

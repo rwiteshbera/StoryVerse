@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
 
     jwt.verify(token, secretKey, (error, payload) => {
       if (error) {
-        res.status(401).json({ message: error });
+        res.status(401).json({ isAuthorized: false, message: error });
         return;
       }
       req.user = payload;

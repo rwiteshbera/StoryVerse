@@ -43,7 +43,9 @@ router.get("/v1/feed", authorization, async (req, res) => {
   }
 });
 
-const upload = multer();
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 // Upload new image on socials
 router.post(
   "/v1/upload",
@@ -51,7 +53,9 @@ router.post(
   authorization,
   async (req, res) => {
     if (!req.file && !req.body.captions) {
-      return res.json({ message: "Input field shouldn't be empty." });
+      return res
+        .status(200)
+        .json({ message: "Input field shouldn't be empty." });
     }
 
     const extname = path.extname(req.file.originalname).toString();

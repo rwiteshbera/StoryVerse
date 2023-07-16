@@ -30,8 +30,8 @@ router.get("/v1/user", authorization, async (req, res) => {
     const {
       name,
       username,
-      email,
       profilePhoto,
+      bio,
       gender,
       following,
       followers,
@@ -40,8 +40,8 @@ router.get("/v1/user", authorization, async (req, res) => {
       message: {
         name,
         username,
-        email,
         profilePhoto,
+        bio,
         gender,
         following,
         followers,

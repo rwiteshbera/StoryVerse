@@ -3,9 +3,27 @@ import Images from "../../assets/images";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
+import axios from "axios";
+import useSWR from "swr";
 
 const Accounts = () => {
   const AppTitle = "PixBy";
+  let navigate = useNavigate();
+
+  const fetcher = (url) =>
+    axios
+      .get(url)
+      .then((res) => {
+        if (res.data?.isAuthorized) {
+          navigate("/home");
+        }
+      })
+      .catch((e) => {
+        navigate("/");
+      });
+
+  const { data, error } = useSWR("/v1", fetcher);
+
   return (
     <>
       <div className="flex flex-row items-center justify-center mt-[20vh] gap-x-10">
