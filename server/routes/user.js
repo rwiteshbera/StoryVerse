@@ -225,8 +225,9 @@ router.post("/search", (req, res) => {
 });
 
 // Get following users list
-router.get("/v1/following", authorization, async (req, res) => {
-  const { username } = req.body;
+router.get("/v1/:username/following", authorization, async (req, res) => {
+  const { username } = req.params;
+  console.log(username)
   try {
     const user = await User.findOne({ username: username }).exec();
     if (!user) {
@@ -242,8 +243,8 @@ router.get("/v1/following", authorization, async (req, res) => {
 });
 
 // Get followers list
-router.get("/v1/followers", authorization, async (req, res) => {
-  const { username } = req.body;
+router.get("/v1/:username/followers", authorization, async (req, res) => {
+  const { username } = req.params;
   try {
     const user = await User.findOne({ username: username }).exec();
     if (!user) {
