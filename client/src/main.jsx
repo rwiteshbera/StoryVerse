@@ -8,7 +8,8 @@ import Accounts from "./components/Account/Account";
 import Error from "./components/Error/Error";
 import Signup from "./components/Account/Signup/Signup";
 import App from "./App";
-import Profile from "./components/Profile/Profile";
+import AdminProfile from "./components/AdminProfile/AdminProfile";
+import UserProfile from "./components/UserProfile/UserProfile"
 
 const router = createBrowserRouter([
   {
@@ -25,11 +26,16 @@ const router = createBrowserRouter([
   {
     path: "/home/*",
     element: <App />,
+    errorElement: <Error />,
     children: [
       {
         path: "user",
-        element: <Profile />,
+        element: <AdminProfile />,
       },
+      {
+        path: ":username",
+        element: <UserProfile />
+      }
     ],
   },
 ]);

@@ -1,41 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Posts from "./Posts/Posts";
 import axios from "axios";
 import useSWR, { preload } from "swr";
+import { useParams } from "react-router-dom";
 
-const Profile = () => {
-  const [profileData, setProfileData] = useState();
-  const [post, setPost] = useState([]);
+const UserProfile = ({}) => {
+  const [profileData, setUserProfileData] = useState([]);
+  const [post, setUserPostsData] = useState([]);
 
-  const {
-    data: user,
-    error: err1,
-    isLoading: loading1,
-  } = useSWR("/v1/user", () => {
+  // Get the username from the params
+  const { username } = useParams();
+
+  const fetcher = (url) =>
     axios
-      .get("/v1/user", { headers: "application/json", withCredentials: true })
-      .then((res) => setProfileData(res.data?.message));
-  });
-  if (err1) {
-    console.log(err1);
+      .get(url)
+      .then((res) => {
+        setUserProfileData(res.data?.user);
+        setUserPostsData(res.data?.posts);
+      })
+      .catch((e) => {
+        navigate("/");
+      });
+
+  const { data, error, isLoading } = useSWR(`/v1/user/${username}`, fetcher);
+  if (error) {
+    window.location.reload();
   }
 
-  const {
-    data: posts,
-    error: err2,
-    isLoading: loading2,
-  } = useSWR("/v1/user/posts", () => {
-    axios
-      .get("/v1/user/posts", {
-        headers: "application/json",
-        withCredentials: true,
-      })
-      .then((res) => {
-        setPost(res.data?.message);
-      });
-  });
-  if (err2) {
-    console.log(err1);
+  if (isLoading) {
+    return  <section className="mt-10 text-2xl text-center">Loading...</section>
   }
 
   return (
@@ -67,4 +60,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default UserProfile;

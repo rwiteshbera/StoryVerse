@@ -144,7 +144,7 @@ router.get("/v1/user/:username", authorization, async (req, res) => {
       .populate("postedBy", "_id username")
       .exec();
 
-    return res.status(200).json({ data: userData, posts: posts });
+    return res.status(200).json({ user: userData, posts: posts });
   } catch (err) {
     return res.status(422).json({ error: err });
   }
@@ -257,5 +257,13 @@ router.get("/v1/followers", authorization, async (req, res) => {
     return res.status(500).json({ error });
   }
 });
+
+
+// Logout // Clear cookies
+router.post("/v1/logout", (request, response) => {
+  response.clearCookie("authorization");
+  response.clearCookie("username");
+  return response.end();
+})
 
 module.exports = router;

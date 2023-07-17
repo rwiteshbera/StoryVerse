@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Images from "../../assets/images";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./Login/Login";

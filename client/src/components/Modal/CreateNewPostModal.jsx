@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import axios from "axios";
 
 const CreateNewPostModal = ({ onClose }) => {
   const [imageFile, setImageFile] = useState();
@@ -16,7 +17,6 @@ const CreateNewPostModal = ({ onClose }) => {
 
   // Set the state of the image file
   const captureFileChange = (e) => {
-    console.log("captureFile");
     e.preventDefault();
     setImageFile(e.target.files[0]);
   };
@@ -40,6 +40,29 @@ const CreateNewPostModal = ({ onClose }) => {
     fileInputRef.current.value = "";
     onClose();
   };
+
+  // Create New Post // API Call
+  const createNewPostHandler = async () => {
+    const axiosConfig = {
+      headers : {
+        "Content-type" : "multipart/form-data"
+      },
+      withCredentials: true
+    }
+
+    const imageData = new FormData();
+    imageData.append("file", imageFile);
+    imageData.append("caption", captionText);
+
+    try {
+      const {data} = await axios.post("/v1/upload", imageData, axiosConfig);
+      console.log(data);
+    } catch (error) { 
+      console.log(error);
+    } finally {
+      modalCloseHandler();
+    }
+  }
   return (
     <>
       <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center rounded-2xl py-2">
@@ -65,7 +88,7 @@ const CreateNewPostModal = ({ onClose }) => {
           {imageFile && (
             <img
               src={URL.createObjectURL(imageFile)}
-              className="lg:w-[60vh] lg:h-[60vh] w-[70vh] h-[70vh]"
+              className="lg:w-[60vh] lg:h-[60vh] object-fill"
             />
           )}
 
@@ -101,7 +124,7 @@ const CreateNewPostModal = ({ onClose }) => {
             </button>
           )}
           {imageFile && (
-            <button className="bg-second mt-1 px-3 rounded-3xl">Upload</button>
+            <button className="bg-second mt-1 px-3 rounded-3xl" onClick={()=> createNewPostHandler()}>Upload</button>
           )}
         </div>
         {/* <span className="absolute bottom-2 right-2 text-xs">{maximumCaptionCharacters - captionText.length} characters left</span> */}

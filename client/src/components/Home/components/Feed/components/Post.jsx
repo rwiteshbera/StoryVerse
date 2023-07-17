@@ -1,19 +1,34 @@
+import axios from "axios";
 import React from "react";
 import { AiOutlineHeart, AiOutlineComment } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
-const Post = () => {
+const Post = ({ data }) => {
   let navigate = useNavigate();
 
+  const viewProfileFunction = async (username) => {
+    try {
+      navigate(`/home/${username}`);
+    } catch (error) {
+      navigate("/home");
+    }
+  };
   return (
     <>
       <div className="flex flex-col p-2 border-b border-r border-gray-600">
-        <div className="flex flex-row items-center mx-4 gap-x-4 hover:cursor-pointer" onClick={() => navigate("/home/user")}>
-          <CgProfile size={32} />
-          <p>Username</p>
+        <div
+          className="flex flex-row items-center mx-4 gap-x-4 hover:cursor-pointer"
+          onClick={() => viewProfileFunction(data?.postedBy?.username)}
+        >
+          <img
+            src={data?.postedBy?.profilePhoto}
+            width={32}
+            className="rounded-full"
+          />
+          <p>{data?.postedBy?.username}</p>
         </div>
-        <img src="/unsamples/image-2.jpg" className="my-2" draggable="false" />
-        <p className="mx-4">loremText</p>
+        <img src={data?.photo} className="my-2" draggable="false" />
+        <p className="mx-4">{data?.captions}</p>
         <div className="flex flex-row justify-center items-center gap-x-2 mt-2 ">
           <AiOutlineHeart size={32} className="hover:cursor-pointer" />
           <AiOutlineComment size={32} className="hover:cursor-pointer" />

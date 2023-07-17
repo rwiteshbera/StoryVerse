@@ -52,7 +52,7 @@ router.post(
   upload.single("file"),
   authorization,
   async (req, res) => {
-    if (!req.file && !req.body.captions) {
+    if (!req.file && !req.body.caption) {
       return res
         .status(200)
         .json({ message: "Input field shouldn't be empty." });
@@ -87,7 +87,7 @@ router.post(
       }
 
       const post = new Post({
-        captions: req.body.captions,
+        captions: req.body.caption,
         photo: cloudinaryResponse.secure_url,
         postedBy: req.user,
       });
