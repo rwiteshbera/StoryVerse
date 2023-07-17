@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Posts from "./Posts/Posts";
 import axios from "axios";
-import useSWR, { preload } from "swr";
+import useSWR from "swr/immutable";
 import { useParams } from "react-router-dom";
 
 const UserProfile = ({}) => {
@@ -22,13 +22,17 @@ const UserProfile = ({}) => {
         navigate("/");
       });
 
-  const { data, error, isLoading } = useSWR(`/v1/user/${username}`, fetcher);
+  const { data, error, isLoading } = useSWR(`/v1/user/${username}`, fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
   if (error) {
     window.location.reload();
   }
 
   if (isLoading) {
-    return  <section className="mt-10 text-2xl text-center">Loading...</section>
+    return <section className="mt-10 text-2xl text-center">Loading...</section>;
   }
 
   return (

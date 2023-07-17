@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Posts from "./Posts/Posts";
 import axios from "axios";
-import useSWR, { preload } from "swr";
 import { useNavigate } from "react-router-dom";
 
 const Profile = ({ profileData, post }) => {

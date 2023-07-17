@@ -6,7 +6,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import AdminProfile from "./components/AdminProfile/AdminProfile";
 import UserProfile from "./components/UserProfile/UserProfile";
 import axios from "axios";
-import useSWR, { preload } from "swr";
+import useSWR from "swr/immutable";
 
 const App = () => {
   const [profileData, setProfileData] = useState();
@@ -16,14 +16,22 @@ const App = () => {
     data: user,
     error: err1,
     isLoading: loading1,
-  } = useSWR("/v1/user", () => {
-    axios
-      .get("/v1/user", {
-        headers: { "Content-type": "application/json" },
-        withCredentials: true,
-      })
-      .then((res) => setProfileData(res.data?.message));
-  });
+  } = useSWR(
+    "/v1/user",
+    () => {
+      axios
+        .get("/v1/user", {
+          headers: { "Content-type": "application/json" },
+          withCredentials: true,
+        })
+        .then((res) => setProfileData(res.data?.message));
+    },
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
   if (err1) {
     console.log(err1);
   }
