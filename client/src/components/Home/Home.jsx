@@ -5,15 +5,17 @@ import Suggested from "./components/Suggested/Suggested";
 import { useNavigate } from "react-router-dom";
 import useSWR from "swr";
 
-const Home = ({profileData}) => {
+const Home = () => {
   let navigate = useNavigate();
-  
+
+
+
   return (
     <>
       <section className="grid grid-cols-4 gap-2 ">
         <Feed />
         <div>
-          <User profileData={profileData} />
+          {/* <User profileData={profileData} /> */}
           <Suggested />
         </div>
       </section>

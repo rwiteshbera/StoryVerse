@@ -16,7 +16,7 @@ const Posts = ({ data }) => {
                 src={element.photo}
                 key={data.indexOf(element)}
                 draggable="false"
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer w-[100%] h-[100%]"
                 onClick={() => {
                   setViewPostModal(true);
                   setModalImageData(element);
@@ -26,7 +26,14 @@ const Posts = ({ data }) => {
           })}
       </div>
 
-      {viewPostModal && createPortal(<ViewPostModal image={modalImageData} onClose={() => setViewPostModal(false)} />, document.body)}
+      {viewPostModal &&
+        createPortal(
+          <ViewPostModal
+            image={modalImageData}
+            onClose={() => setViewPostModal(false)}
+          />,
+          document.body
+        )}
     </section>
   );
 };

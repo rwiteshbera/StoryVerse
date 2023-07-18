@@ -9,24 +9,21 @@ const Posts = ({ data }) => {
   return (
     <section className="border-t border-gray-600">
       <div className="grid grid-cols-3 gap-1 my-2">
-        {data.length > 0 ? (
+        {data &&
           data.map((element) => {
             return (
               <img
                 src={element.photo}
                 key={data.indexOf(element)}
                 draggable="false"
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer w-[100%] h-[100%]"
                 onClick={() => {
                   setViewPostModal(true);
                   setModalImageData(element);
                 }}
               />
             );
-          })
-        ) : (
-          <div className="text-center">Loading</div>
-        )}
+          })}
       </div>
       {viewPostModal &&
         createPortal(

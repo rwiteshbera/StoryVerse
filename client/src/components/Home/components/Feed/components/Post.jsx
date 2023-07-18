@@ -38,9 +38,6 @@ const Post = ({ data }) => {
     }
   };
 
-  const uncheckLike = () => {
-    console.log("disliked");
-  };
   return (
     <>
       <div className="flex flex-col p-2 border-b border-r border-gray-600">

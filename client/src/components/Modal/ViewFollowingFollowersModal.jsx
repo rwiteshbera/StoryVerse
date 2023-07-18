@@ -38,19 +38,19 @@ const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
 
   return (
     <>
-      <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center rounded-2xl py-2 w-[50%] h-[50%]">
+      <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col rounded-2xl py-2 px-5 w-72 h-[50%]">
         <AiOutlineCloseCircle
           size={24}
           onClick={() => modalCloseHandler()}
           className="absolute top-2 right-2 hover:cursor-pointer"
         />
-        <h1 className="p-5">{type}</h1>
-        <div className="">
+        <h1 className="p-5 text-xl capitalize font-bold">{type}</h1>
+        <div className="overflow-auto">
           {List &&
             List.map((element, key) => {
               return (
                 <div
-                  className="flex flex-row gap-2 items-center hover:cursor-pointer"
+                  className="flex flex-row gap-4 hover:cursor-pointer "
                   key={key}
                   onClick={() => {
                     navigate(`/home/${element.username}`);
@@ -59,10 +59,13 @@ const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
                 >
                   <img
                     src={element.profilePhoto}
-                    width={24}
-                    className="m-1 rounded-full"
+                    width={40}
+                    className="m-2 rounded-full"
                   />
-                  <p>{element.username}</p>
+                  <div className="flex flex-col">
+                    <p className="text-xl">{element.name}</p>
+                    <p className="text-sm">{element.username}</p>
+                  </div>
                 </div>
               );
             })}

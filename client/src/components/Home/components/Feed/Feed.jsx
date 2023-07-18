@@ -27,7 +27,7 @@ const Feed = () => {
 
   const { data, error, isLoading } = useSWR("/v1/feed", fetcher, {
     revalidateIfStale: false,
-    revalidateOnFocus: false,
+    revalidateOnFocus: true,
     revalidateOnReconnect: false,
   });
   if (isLoading) {
@@ -37,7 +37,7 @@ const Feed = () => {
       </div>
     );
   }
-  if (error || feedPosts.length === 0) {
+  if (error) {
     return (
       <div className="col-span-3 flex flex-col justify-center items-center">
         <h1 className="text-center text-2xl mt-10">Unable to load</h1>
@@ -51,8 +51,8 @@ const Feed = () => {
   }
 
   return (
-    <div className="col-span-3">
-      {feedPosts.length &&
+    <div className="lg:col-span-3 col-span-5">
+      {feedPosts &&
         feedPosts.map((post, key) => {
           return <Post key={key} data={post} />;
         })}

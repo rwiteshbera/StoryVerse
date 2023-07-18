@@ -4,11 +4,14 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ViewFollowingFollowersModal from "../Modal/ViewFollowingFollowersModal";
+import useSWR from "swr/immutable";
 
-const AdminProfile = ({ profileData, post }) => {
+const AdminProfile = () => {
   let navigate = useNavigate();
   const [FollowersModal, setFollowersModal] = useState(false);
   const [FollowingModal, setFollowingModal] = useState(false);
+  const [profileData, setProfileData] = useState();
+  const [post, setPost] = useState([]);
 
   const axiosConfig = {
     headers: {
@@ -16,6 +19,47 @@ const AdminProfile = ({ profileData, post }) => {
     },
     withCredentials: true,
   };
+
+  const {
+    data: user,
+    error: err1,
+    mutate: mutateProfileData,
+    isLoading: loading1,
+  } = useSWR(
+    "/v1/user",
+    () => {
+      axios
+        .get("/v1/user", {
+          headers: { "Content-type": "application/json" },
+          withCredentials: true,
+        })
+        .then((res) => {
+          setProfileData(res.data?.message);
+        });
+    },
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+  if (err1) {
+    console.log(err1);
+  }
+
+  const {
+    data: posts,
+    error: err2,
+    mutate: mutatePostsData,
+    isLoading: loading2,
+  } = useSWR("/v1/user/posts", () => {
+    axios.get("/v1/user/posts", axiosConfig).then((res) => {
+      setPost(res.data?.message.reverse());
+    });
+  });
+  if (err2) {
+    console.log(err1);
+  }
 
   const logoutHandler = async () => {
     try {
@@ -72,7 +116,8 @@ const AdminProfile = ({ profileData, post }) => {
         {FollowersModal &&
           createPortal(
             <ViewFollowingFollowersModal
-              data={profileData} type="followers"
+              data={profileData}
+              type="followers"
               onClose={() => setFollowersModal(false)}
             />,
             document.body
@@ -80,7 +125,8 @@ const AdminProfile = ({ profileData, post }) => {
         {FollowingModal &&
           createPortal(
             <ViewFollowingFollowersModal
-              data={profileData} type="following"
+              data={profileData}
+              type="following"
               onClose={() => setFollowingModal(false)}
             />,
             document.body

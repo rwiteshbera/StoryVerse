@@ -1,19 +1,18 @@
 import React from "react";
-import { CgProfile } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
 
-const User = () => {
+const User = ({data}) => {
   let navigate = useNavigate();
 
   return (
     <section
-      className="md:flex md:flex-row hidden gap-2 items-center  rounded-lg h-fit  py-2 hover:cursor-pointer"
-      onClick={() => navigate("/home/user")}
+      className="md:flex md:flex-row gap-2 items-center rounded-lg py-2 hover:cursor-pointer"
+      onClick={() => navigate(`/home/${data.username}`)}
     >
-      <CgProfile size={24} />
+      <img src={data.profilePhoto} width={32} className="rounded-full"/>
       <div className="flex flex-col">
-        <p className="text-base">Rwitesh Bera</p>
-        <p className="text-xs">@rwitesh</p>
+        <p className="text-base">{data.name}</p>
+        <p className="text-xs">@{data.username}</p>
       </div>
     </section>
   );

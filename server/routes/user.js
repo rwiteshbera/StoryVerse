@@ -127,7 +127,7 @@ router.get("/v1/user/:username", authorization, async (req, res) => {
     const userData = await User.findOne(
       { username },
       "-email -password -logInActivity -isDeactivated" // Get all the fields except these
-    ).exec();
+    ).populate("following followers", "-_id username");
 
     if (userData == null) {
       return res.status(401).json({ data: "no user found" });
@@ -145,15 +145,21 @@ router.get("/v1/user/:username", authorization, async (req, res) => {
       return { ...post.toObject(), adminLiked: liked };
     });
 
-    return res.status(200).json({ user: userData, posts: posts });
+    return res.status(200).json({
+      user: userData,
+      posts: posts,
+      isFollowedByAdmin: userData.followers.some(
+        (e) => e.username === req.user.username
+      ),
+    });
   } catch (err) {
     return res.status(422).json({ error: err });
   }
 });
 
 // Follow users
-router.put("/v1/follow", authorization, async (req, res) => {
-  const { username } = req.body;
+router.put("/v1/follow/:username", authorization, async (req, res) => {
+  const { username } = req.params;
   try {
     const followedUser = await User.findOneAndUpdate(
       { username: username },
@@ -181,8 +187,8 @@ router.put("/v1/follow", authorization, async (req, res) => {
 });
 
 // Unfollow users
-router.put("/v1/unfollow", authorization, async (req, res) => {
-  const { username } = req.body;
+router.put("/v1/unfollow/:username", authorization, async (req, res) => {
+  const { username } = req.params;
   try {
     const unfollowedUser = await User.findOneAndUpdate(
       { username: username },
@@ -254,6 +260,25 @@ router.get("/v1/:username/followers", authorization, async (req, res) => {
       .select("-_id name username profilePhoto")
       .exec();
     return res.status(200).json({ followers: followingList });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
+// Suggest Random User
+router.get("/v1/suggestion/users", authorization, async (request, response) => {
+  const { username } = request.user;
+
+  try {
+    let suggestedUsers = [];
+    const data = await User.find().select("-_id name username profilePhoto");
+
+    for (let i = 0; i < 5; i++) {
+      let randomIndex = Math.floor(Math.random() * data.length);
+      suggestedUsers.push(data[randomIndex]);
+    }
+
+    response.status(200).json({ currentUser: { username }, suggestedUsers });
   } catch (error) {
     return res.status(500).json({ error });
   }

@@ -1,8 +1,10 @@
 import React, { useRef, useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import axios from "axios";
+import { useSWRConfig } from "swr";
 
 const CreateNewPostModal = ({ onClose }) => {
+  const { mutate } = useSWRConfig();
   const [imageFile, setImageFile] = useState();
   const [captionText, setCaptionText] = useState();
 
@@ -44,25 +46,30 @@ const CreateNewPostModal = ({ onClose }) => {
   // Create New Post // API Call
   const createNewPostHandler = async () => {
     const axiosConfig = {
-      headers : {
-        "Content-type" : "multipart/form-data"
+      headers: {
+        "Content-type": "multipart/form-data",
       },
-      withCredentials: true
-    }
+      withCredentials: true,
+    };
 
     const imageData = new FormData();
     imageData.append("file", imageFile);
     imageData.append("caption", captionText);
 
     try {
-      const {data} = await axios.post("/v1/upload", imageData, axiosConfig);
+      const { data} = await axios.post(
+        "/v1/upload",
+        imageData,
+        axiosConfig
+      );
+      mutate("/v1/user/posts");
       console.log(data);
-    } catch (error) { 
+    } catch (error) {
       console.log(error);
     } finally {
       modalCloseHandler();
     }
-  }
+  };
   return (
     <>
       <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center rounded-2xl py-2">
@@ -124,7 +131,12 @@ const CreateNewPostModal = ({ onClose }) => {
             </button>
           )}
           {imageFile && (
-            <button className="bg-second mt-1 px-3 rounded-3xl" onClick={()=> createNewPostHandler()}>Upload</button>
+            <button
+              className="bg-second mt-1 px-3 rounded-3xl"
+              onClick={() => createNewPostHandler()}
+            >
+              Upload
+            </button>
           )}
         </div>
         {/* <span className="absolute bottom-2 right-2 text-xs">{maximumCaptionCharacters - captionText.length} characters left</span> */}

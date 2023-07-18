@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 const ViewPostModal = ({ onClose, image }) => {
   const [likeCount, setLikeCount] = useState(image.likes?.length);
-  console.log(image);
+  
   let navigate = useNavigate();
   const modalCloseHandler = () => {
     onClose();
