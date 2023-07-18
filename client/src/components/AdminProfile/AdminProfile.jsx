@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ViewFollowingFollowersModal from "../Modal/ViewFollowingFollowersModal";
 
-const Profile = ({ profileData, post }) => {
+const AdminProfile = ({ profileData, post }) => {
   let navigate = useNavigate();
   const [FollowersModal, setFollowersModal] = useState(false);
   const [FollowingModal, setFollowingModal] = useState(false);
@@ -90,4 +90,4 @@ const Profile = ({ profileData, post }) => {
   );
 };
 
-export default Profile;
+export default AdminProfile;

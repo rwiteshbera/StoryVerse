@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useSWR from "swr/immutable";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
 const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
+  let navigate = useNavigate();
   const [List, setList] = useState([]);
 
   const axiosConfig = {
@@ -37,7 +39,11 @@ const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
   return (
     <>
       <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center rounded-2xl py-2 w-[50%] h-[50%]">
-        <AiOutlineCloseCircle size={24} onClick={() => modalCloseHandler()} className="absolute top-2 right-2 hover:cursor-pointer"/>
+        <AiOutlineCloseCircle
+          size={24}
+          onClick={() => modalCloseHandler()}
+          className="absolute top-2 right-2 hover:cursor-pointer"
+        />
         <h1 className="p-5">{type}</h1>
         <div className="">
           {List &&
@@ -46,8 +52,16 @@ const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
                 <div
                   className="flex flex-row gap-2 items-center hover:cursor-pointer"
                   key={key}
+                  onClick={() => {
+                    navigate(`/home/${element.username}`);
+                    modalCloseHandler();
+                  }}
                 >
-                  <img src={element.profilePhoto} width={24} className="m-1 rounded-full" />
+                  <img
+                    src={element.profilePhoto}
+                    width={24}
+                    className="m-1 rounded-full"
+                  />
                   <p>{element.username}</p>
                 </div>
               );

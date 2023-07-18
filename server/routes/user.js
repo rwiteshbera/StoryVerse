@@ -27,15 +27,8 @@ router.get("/v1/user", authorization, async (req, res) => {
   const { _id } = req.user;
   try {
     const data = await User.findById(_id).exec();
-    const {
-      name,
-      username,
-      profilePhoto,
-      bio,
-      gender,
-      following,
-      followers,
-    } = data;
+    const { name, username, profilePhoto, bio, gender, following, followers } =
+      data;
     return res.status(200).json({
       message: {
         name,
@@ -140,9 +133,17 @@ router.get("/v1/user/:username", authorization, async (req, res) => {
       return res.status(401).json({ data: "no user found" });
     }
 
-    const posts = await Post.find({ postedBy: userData._id })
-      .populate("postedBy", "_id username")
-      .exec();
+    let posts = await Post.find({ postedBy: userData._id })
+      .populate("postedBy", "_id username profilePhoto")
+      .populate("likes", "-_id username");
+
+    posts = posts.map((post) => {
+      // Check if the current login user has liked the post or not?
+      const liked = post.likes.some(
+        (like) => like.username === req.user.username
+      );
+      return { ...post.toObject(), adminLiked: liked };
+    });
 
     return res.status(200).json({ user: userData, posts: posts });
   } catch (err) {
@@ -227,7 +228,6 @@ router.post("/search", (req, res) => {
 // Get following users list
 router.get("/v1/:username/following", authorization, async (req, res) => {
   const { username } = req.params;
-  console.log(username)
   try {
     const user = await User.findOne({ username: username }).exec();
     if (!user) {
@@ -259,12 +259,11 @@ router.get("/v1/:username/followers", authorization, async (req, res) => {
   }
 });
 
-
 // Logout // Clear cookies
 router.post("/v1/logout", (request, response) => {
   response.clearCookie("authorization");
   response.clearCookie("username");
   return response.end();
-})
+});
 
 module.exports = router;

@@ -13,7 +13,7 @@ import UserProfile from "./components/UserProfile/UserProfile"
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "*",
     element: <Accounts />,
     errorElement: <Error />,
     children: [

@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Posts from "./Posts/Posts";
 import axios from "axios";
 import useSWR from "swr/immutable";
 import { useParams } from "react-router-dom";
+import ViewFollowingFollowersModal from "../Modal/ViewFollowingFollowersModal";
 
 const UserProfile = ({}) => {
   const [profileData, setUserProfileData] = useState([]);
   const [post, setUserPostsData] = useState([]);
+
+  // Modal State Handling
+  const [FollowersModal, setFollowersModal] = useState(false);
+  const [FollowingModal, setFollowingModal] = useState(false);
 
   // Get the username from the params
   const { username } = useParams();
@@ -49,10 +55,16 @@ const UserProfile = ({}) => {
 
           <div className="flex flex-row gap-x-16 mt-5">
             <p className="hover:cursor-pointer">{post.length} Posts</p>
-            <p className="hover:cursor-pointer">
+            <p
+              className="hover:cursor-pointer"
+              onClick={() => setFollowingModal(true)}
+            >
               {profileData?.following?.length} Following{" "}
             </p>
-            <p className="hover:cursor-pointer">
+            <p
+              className="hover:cursor-pointer"
+              onClick={() => setFollowersModal(true)}
+            >
               {profileData?.followers?.length} Followers{" "}
             </p>
           </div>
@@ -60,6 +72,27 @@ const UserProfile = ({}) => {
       </div>
       <p className="py-5 mx-10">{profileData?.bio}</p>
       <Posts data={post} />
+
+      <>
+        {FollowersModal &&
+          createPortal(
+            <ViewFollowingFollowersModal
+              data={profileData}
+              type="followers"
+              onClose={() => setFollowersModal(false)}
+            />,
+            document.body
+          )}
+        {FollowingModal &&
+          createPortal(
+            <ViewFollowingFollowersModal
+              data={profileData}
+              type="following"
+              onClose={() => setFollowingModal(false)}
+            />,
+            document.body
+          )}
+      </>
     </section>
   );
 };

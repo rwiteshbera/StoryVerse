@@ -31,13 +31,21 @@ router.get("/v1/feed", authorization, async (req, res) => {
   try {
     const loginUserData = await User.findOne({ _id: req.user._id });
 
-    const feedPosts = await Post.find({
+    let feedPosts = await Post.find({
       postedBy: { $in: loginUserData.following },
     })
-      .select("-_id")
-      .populate("postedBy", "-_id username profilePhoto");
+      .populate("postedBy", "-_id username profilePhoto")
+      .populate("likes", "-_id username");
 
-    return res.json(feedPosts);
+    feedPosts = feedPosts.map((post) => {
+      // Check if the current login user has liked the post or not?
+      const liked = post.likes.some(
+        (like) => like.username === req.user.username
+      );
+      return { ...post.toObject(), adminLiked: liked };
+    });
+
+    return res.status(200).json({ message: feedPosts });
   } catch (error) {
     return res.status(500).json({ error: "failed to load posts" });
   }
@@ -104,7 +112,18 @@ router.post(
 // All the post created by the logged-in user
 router.get("/v1/user/posts", authorization, async (req, res) => {
   try {
-    const posts = await Post.find({ postedBy: req.user._id });
+    let posts = await Post.find({ postedBy: req.user._id })
+      .populate("postedBy", "-_id username profilePhoto")
+      .populate("likes", "-_id username");
+
+    posts = posts.map((post) => {
+      // Check if the current login user has liked the post or not?
+      const liked = post.likes.some(
+        (like) => like.username === req.user.username
+      );
+      return { ...post.toObject(), adminLiked: liked };
+    });
+
     return res.status(200).json({ message: posts });
   } catch (error) {
     return res.status(500).json({ error: "unable to load posts" });
@@ -112,44 +131,41 @@ router.get("/v1/user/posts", authorization, async (req, res) => {
 });
 
 // Like button
-router.put("/v1/like/check", authorization, (req, res) => {
+router.put("/v1/like/check", authorization, async (req, res) => {
   let { id } = req.query;
 
-  Post.findByIdAndUpdate(
-    id,
-    {
-      $addToSet: { likes: req.user._id },
-    },
-    {
-      new: true,
-    }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    } else {
-      return res.status(200).json({ message: result });
-    }
-  });
+  try {
+    const data = await Post.findByIdAndUpdate(
+      id,
+      {
+        $addToSet: { likes: req.user._id },
+      },
+      { new: true }
+    ).exec();
+
+    return res.status(200).json({ message: data });
+  } catch (error) {
+    return res.status(422).json({ error: error });
+  }
 });
 
 // Uncheck Like button
-router.put("/v1/like/uncheck", authorization, (req, res) => {
+router.put("/v1/like/uncheck", authorization, async (req, res) => {
   let { id } = req.query;
-  Post.findByIdAndUpdate(
-    id,
-    {
-      $pull: { likes: req.user._id },
-    },
-    {
-      new: true,
-    }
-  ).exec((err, result) => {
-    if (err) {
-      return res.status(422).json({ error: err });
-    } else {
-      return res.status(200).json({ message: result });
-    }
-  });
+
+  try {
+    const data = await Post.findByIdAndUpdate(
+      id,
+      {
+        $pull: { likes: req.user._id },
+      },
+      { new: true }
+    ).exec();
+
+    return res.status(200).json({ message: data });
+  } catch (error) {
+    return res.status(422).json({ error: error });
+  }
 });
 
 // delete your own post

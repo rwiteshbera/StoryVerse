@@ -20,7 +20,7 @@ router.get("/v1", authorization, (req, res) => {
   if (!req.user) {
     return res.status(401).json({ isAuthorized: false });
   }
-  return res.status(200).json({ isAuthorized: true });
+  return res.status(200).json({ isAuthorized: true, username: req.user.username });
 });
 
 // Signup process

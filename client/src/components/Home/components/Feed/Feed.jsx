@@ -13,7 +13,13 @@ const Feed = () => {
     axios
       .get(url)
       .then((res) => {
-        setFeedPosts(res.data?.reverse());
+        const feed = res.data?.message.map((post) => {
+          if (post.likes.some((like) => like.username === "rwitesh")) {
+            return { ...post, adminLiked: true };
+          }
+          return post;
+        });
+        setFeedPosts(feed.reverse());
       })
       .catch((e) => {
         navigate("/");
