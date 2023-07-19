@@ -2,6 +2,9 @@
 
 ## A Full Stack Social Media Application
 
+![Login](./assets/storyverse1.png)
+![Sign Up](./assets/storyverse2.png)
+
 ## Built with
 
 1. React
