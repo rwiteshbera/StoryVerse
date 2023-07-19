@@ -43,16 +43,21 @@ const Post = ({ data }) => {
       <div className="flex flex-col p-2 border-b border-r border-gray-600">
         <div
           className="flex flex-row items-center mx-4 gap-x-4 hover:cursor-pointer"
-          onClick={() => viewProfileFunction(data?.postedBy?.username)}
+          onClick={() => viewProfileFunction(data?.author?.username)}
         >
           <img
-            src={data.postedBy?.profilePhoto}
+            src={data.author?.profilePhoto}
             width={32}
             className="rounded-full"
           />
-          <p>{data.postedBy?.username}</p>
+          <p>{data.author?.username}</p>
         </div>
-        <img src={data?.photo} className="my-2 select-none" draggable="false" />
+
+        <img
+          src={data.photo?.url}
+          className="my-2 select-none"
+          draggable="false"
+        />
         <p className="mx-4">{data?.captions}</p>
         <div className="flex flex-row justify-center items-center gap-x-2 mt-2 ">
           {!data.adminLiked ? (

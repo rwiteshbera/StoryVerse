@@ -5,7 +5,7 @@ const MONGO_DATABASE_NAME = process.env.MONGO_DATABASE_NAME;
 
 mongoose
   .connect(process.env.MONGO_URI, { dbName: MONGO_DATABASE_NAME, family: 4 })
-  .then((res) => {
+  .then((response) => {
     console.log(`Connected to MongoDB : ${MONGO_DATABASE_NAME}`);
   })
   .catch((error) => {

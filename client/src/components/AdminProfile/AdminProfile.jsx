@@ -33,8 +33,8 @@ const AdminProfile = () => {
           headers: { "Content-type": "application/json" },
           withCredentials: true,
         })
-        .then((res) => {
-          setProfileData(res.data?.message);
+        .then((response) => {
+          setProfileData(response.data?.message);
         });
     },
     {
@@ -53,8 +53,8 @@ const AdminProfile = () => {
     mutate: mutatePostsData,
     isLoading: loading2,
   } = useSWR("/v1/user/posts", () => {
-    axios.get("/v1/user/posts", axiosConfig).then((res) => {
-      setPost(res.data?.message.reverse());
+    axios.get("/v1/user/posts", axiosConfig).then((response) => {
+      setPost(response.data?.message.reverse());
     });
   });
   if (err2) {
@@ -64,6 +64,7 @@ const AdminProfile = () => {
   const logoutHandler = async () => {
     try {
       await axios.post("/v1/logout", {}, axiosConfig);
+      localStorage.clear();
       navigate("/");
     } catch (error) {
       window.location.reload();
@@ -73,22 +74,13 @@ const AdminProfile = () => {
   return (
     <section className="mt-10">
       <div className="flex flex-row relative items-centerborder mx-10">
-        <button className="absolute right-0 top-0 rounded-md bg-black border border-gray-600 hover:bg-second px-3 py-1 w-28">
-          Edit Profile
-        </button>
-        <button
-          className="absolute right-0 top-10 rounded-md bg-black border border-gray-600  hover:bg-second px-3 py-1  w-28"
-          onClick={() => logoutHandler()}
-        >
-          Logout
-        </button>
         <img
           src={profileData?.profilePhoto}
           className="rounded-full w-32 h-32"
           draggable="false"
         />
 
-        <div className="ml-10">
+        <div className="ml-10 w-full">
           <p className="text-3xl">{profileData?.name}</p>
           <p className="text-base">@{profileData?.username}</p>
 
@@ -107,6 +99,23 @@ const AdminProfile = () => {
               {profileData?.followers?.length} Followers{" "}
             </p>
           </div>
+        </div>
+        <div className="flex flex-col justify-center gap-y-2">
+          <button
+            className="h-min rounded-md bg-black border border-gray-600 hover:bg-second px-3 py-1 w-28 "
+            onClick={() => {
+              FollowHandler();
+            }}
+          >
+            Edit Profile
+          </button>
+
+          <button
+            className="h-min rounded-md bg-black border border-gray-600  hover:bg-second px-3 py-1  w-28"
+            onClick={() => logoutHandler()}
+          >
+            Logout
+          </button>
         </div>
       </div>
       <p className="py-5 mx-10">{profileData?.bio}</p>

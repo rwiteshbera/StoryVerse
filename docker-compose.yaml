@@ -3,7 +3,7 @@ services:
   client:
     build:
       context: ./client
-    image: pixby-client-app
+    image: storyverse-client-app
     ports:
       - "3000:3000"
     env_file: ./client/.env
@@ -11,7 +11,7 @@ services:
   server:
     build:
       context: ./server
-    image: pixby-server-app
+    image: storyverse-server-app
     ports:
       - "5050:5050"
     env_file: ./server/.env

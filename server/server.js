@@ -27,6 +27,7 @@ require("./database/mongodb");
 // Database Schema
 require("./models/user");
 require("./models/post");
+require("./models/photo");
 
 // React Router
 app.use(require("./routes/authentication"));

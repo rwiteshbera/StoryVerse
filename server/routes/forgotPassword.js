@@ -17,11 +17,11 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
 // Forgot Password // Send a special token to email
-router.post("/v1/forgot_password", async (req, res) => {
-  const { email } = req.body;
+router.post("/v1/forgot_password", async (request, response) => {
+  const { email } = request.body;
 
   if (!email) {
-    return res.status(422).json({ message: "no email found" });
+    return response.status(422).json({ message: "no email found" });
   }
 
   try {
@@ -30,7 +30,7 @@ router.post("/v1/forgot_password", async (req, res) => {
 
     // Check if user exists or not
     if (!savedUser) {
-      return res.status(422).json({ message: "no user found with this email" });
+      return response.status(422).json({ message: "no user found with this email" });
     }
 
     // Create a user payload
@@ -67,72 +67,72 @@ router.post("/v1/forgot_password", async (req, res) => {
       })
       .sendMail(message, (err) => {
         if (err) {
-          return res.status(500).json({ message: "Internal Server Error" });
+          return response.status(500).json({ message: "Internal Server Error" });
         } else {
           console.log(specialToken);
-          return res.status(200).json({
+          return response.status(200).json({
             message: "Password reset link has been sent to your email.",
           });
         }
       });
   } catch (error) {
-    return res.status(500).json({ errror: error });
+    return response.status(500).json({ errror: error });
   }
 });
 
 // Reset link validation
-router.get("/v1/forgot_password", async (req, res) => {
-  let { token, username } = req.query;
+router.get("/v1/forgot_password", async (request, response) => {
+  let { token, username } = request.query;
 
   try {
     const savedUser = await User.findOne({ username: username });
 
     if (!savedUser) {
-      return res.status(422).json({ error: "invalid link" });
+      return response.status(422).json({ error: "invalid link" });
     }
 
     jwt.verify(token, SECRET_KEY, (err, payload) => {
       if (err) {
-        return res.status(422).json({ error: "token has been expired" });
+        return response.status(422).json({ error: "token has been expired" });
       }
 
       if (payload.username !== username) {
-        return res.status(422).json({ error: "invalid link" });
+        return response.status(422).json({ error: "invalid link" });
       }
 
       generateHashpassword(payload.id)
         .then((reset_id) => {
-          res.cookie("reset_id", reset_id, {
+          response.cookie("reset_id", reset_id, {
             secure: true,
             httpOnly: true,
             expiresIn: 1000 * 60 * 5, // 5 Minutes
           });
 
-          res.status(200).json({ username, status: "ok" });
+          response.status(200).json({ username, status: "ok" });
         })
         .catch((err) => {
-          return res.status(422).json({ error: err });
+          return response.status(422).json({ error: err });
         });
     });
   } catch (error) {
-    return res.status(422).json({ error: error });
+    return response.status(422).json({ error: error });
   }
 });
 
 // If user click on forgot password button after giving new password
-router.post("/v1/reset_password", async (req, res) => {
-  let reset_id = req.cookies.reset_id;
+router.post("/v1/reset_password", async (request, response) => {
+  let reset_id = request.cookies.reset_id;
 
-  let { username, newPassword } = req.body;
+  let { username, newPassword } = request.body;
 
   if (!reset_id || !username || !newPassword) {
-    return res.status(422).json({ error: "unable to update password" });
+    return response.status(422).json({ error: "unable to update password" });
   }
 
   try {
     const savedUser = await User.findOne({ username: username });
     if (!savedUser) {
-      return res.status(422).json({ error: "unable to update password" });
+      return response.status(422).json({ error: "unable to update password" });
     }
 
     const isValidResetId = await validateHashpassword(
@@ -141,14 +141,14 @@ router.post("/v1/reset_password", async (req, res) => {
     );
 
     if (!isValidResetId) {
-      return res.status(422).json({ error: "unable to update password" });
+      return response.status(422).json({ error: "unable to update password" });
     }
 
     // Hash the password
     let hashedPassword = await generateHashpassword(newPassword);
 
     if (!hashedPassword) {
-      return res.status(500).json({
+      return response.status(500).json({
         error: "unable to update password",
       });
     }
@@ -159,12 +159,12 @@ router.post("/v1/reset_password", async (req, res) => {
     );
 
     if (!result) {
-      return res.status(422).json({ error: "unable to update password" });
+      return response.status(422).json({ error: "unable to update password" });
     }
-    res.clearCookie("reset_id");
-    return res.status(200).json({ message: "password updated successfully" });
+    response.clearCookie("reset_id");
+    return response.status(200).json({ message: "password updated successfully" });
   } catch (error) {
-    return res.status(422).json({ error: "unable to update password" });
+    return response.status(422).json({ error: "unable to update password" });
   }
 });
 

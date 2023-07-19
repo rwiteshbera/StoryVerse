@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ImHome } from "react-icons/im";
 import { FaBell } from "react-icons/fa";
@@ -6,11 +6,21 @@ import { IoIosCreate } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
 import CreateNewPostModal from "../Modal/CreateNewPostModal";
+import { mutate } from "swr";
 
 const Navbar = () => {
   let navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
+  const localUser = JSON.parse(localStorage.getItem("user"));
+  const avatarLink = localUser?.avatar;
+  useEffect(() => {
+    console.log("da");
+    if (!localUser) {
+      navigate("/");
+    }
+  }, []);
+  
   return (
     <>
       <div
@@ -22,7 +32,7 @@ const Navbar = () => {
           placeholder="Search user"
         />
         <div
-          className="flex flex-row justify-center items-center lg:gap-6 gap-2"
+          className="flex flex-row justify-center items-center w-max xl:gap-x-6 lg:gap-x-3 gap-x-1"
           draggable="false"
         >
           <ImHome
@@ -41,17 +51,25 @@ const Navbar = () => {
               setShowModal(true);
             }}
           />
-          <CgProfile
-            className="hover:cursor-pointer hover:text-second"
-            size={24}
-            onClick={() => navigate("/home/user")}
+
+          <img
+            className="hover:cursor-pointer hover:outline hover:outline-second rounded-full"
+            src={avatarLink}
+            width={24}
+            onClick={() => {
+              navigate("/home/user");
+            }}
           />
         </div>
         <p
-          className="text-center text-3xl m-1 select-none hover:cursor-pointer"
-          onClick={() => navigate("/home")}
+          className="text-center xl:text-3xl text-2xl xl:ml-5 ml-0 select-none hover:cursor-pointer"
+          onClick={() => {
+            navigate("/home");
+            mutate("/v1/feed");
+            mutate("/v1/suggestion/users");
+          }}
         >
-          PixBy
+          StoryVerse
         </p>
       </div>
 

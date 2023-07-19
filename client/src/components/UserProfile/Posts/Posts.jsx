@@ -13,7 +13,7 @@ const Posts = ({ data }) => {
           data.map((element) => {
             return (
               <img
-                src={element.photo}
+                src={element.photo?.url}
                 key={data.indexOf(element)}
                 draggable="false"
                 className="hover:cursor-pointer w-[100%] h-[100%]"

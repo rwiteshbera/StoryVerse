@@ -23,13 +23,13 @@ cloudinary.config({
 // Cloudinary Setup
 
 // fetch logged-in user data
-router.get("/v1/user", authorization, async (req, res) => {
-  const { _id } = req.user;
+router.get("/v1/user", authorization, async (request, response) => {
+  const { _id } = request.user;
   try {
     const data = await User.findById(_id).exec();
     const { name, username, profilePhoto, bio, gender, following, followers } =
       data;
-    return res.status(200).json({
+    return response.status(200).json({
       message: {
         name,
         username,
@@ -41,7 +41,7 @@ router.get("/v1/user", authorization, async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(422).json({ error: err });
+    return response.status(422).json({ error: err });
   }
 });
 
@@ -53,18 +53,18 @@ router.patch(
   "/v1/profile-photo/change",
   upload.single("file"),
   authorization,
-  async (req, res) => {
-    if (!req.file) {
-      return res.status(422).json({ message: "no image found" });
+  async (request, response) => {
+    if (!request.file) {
+      return response.status(422).json({ message: "no image found" });
     }
 
-    const _id = req.user._id;
+    const _id = request.user._id;
     if (!_id) {
-      return res.status(500).json({ error: "unable to change photo" });
+      return response.status(500).json({ error: "unable to change photo" });
     }
 
-    const extname = path.extname(req.file.originalname).toString();
-    const file64 = parser.format(extname, req.file.buffer);
+    const extname = path.extname(request.file.originalname).toString();
+    const file64 = parser.format(extname, request.file.buffer);
 
     if (extname !== ".jpeg" && extname !== ".png" && extname !== ".jpg") {
       response
@@ -75,8 +75,7 @@ router.patch(
     // Use the uploaded file's name as the asset's public ID and
     // allow overwriting the asset with new versions
     const options = {
-      use_filename: true,
-      unique_filename: false,
+      unique_filename: true,
       overwrite: true,
     };
 
@@ -88,14 +87,14 @@ router.patch(
       );
 
       if (!cloudinaryResponse) {
-        return res.status(422).json({ error: "unable to change photo" });
+        return response.status(422).json({ error: "unable to change photo" });
       }
 
       // Get Userdata
       const userdata = await User.findById(_id);
 
       if (!userdata) {
-        return res.status(422).json({ error: "unable to change photo" });
+        return response.status(422).json({ error: "unable to change photo" });
       }
 
       // Extract Public Id of Previous Image from URL
@@ -112,16 +111,16 @@ router.patch(
       // Remove Previous Image From Cloudinary
       await cloudinary.uploader.destroy(publicIdToDelete);
 
-      return res.status(200).json({ message: data.profilePhoto });
+      return response.status(200).json({ message: data.profilePhoto });
     } catch (error) {
-      return res.status(500).json({ error: "unable to change photo" });
+      return response.status(500).json({ error: "unable to change photo" });
     }
   }
 );
 
 // See other user's profile
-router.get("/v1/user/:username", authorization, async (req, res) => {
-  const username = req.params.username;
+router.get("/v1/user/:username", authorization, async (request, response) => {
+  const username = request.params.username;
 
   try {
     const userData = await User.findOne(
@@ -130,48 +129,49 @@ router.get("/v1/user/:username", authorization, async (req, res) => {
     ).populate("following followers", "-_id username");
 
     if (userData == null) {
-      return res.status(401).json({ data: "no user found" });
+      return response.status(401).json({ data: "no user found" });
     }
 
-    let posts = await Post.find({ postedBy: userData._id })
-      .populate("postedBy", "_id username profilePhoto")
-      .populate("likes", "-_id username");
+    let posts = await Post.find({ author: userData._id })
+      .populate("author", "_id username profilePhoto")
+      .populate("likes", "-_id username")
+      .populate("photo", "-_id url");
 
     posts = posts.map((post) => {
       // Check if the current login user has liked the post or not?
       const liked = post.likes.some(
-        (like) => like.username === req.user.username
+        (like) => like.username === request.user.username
       );
       return { ...post.toObject(), adminLiked: liked };
     });
 
-    return res.status(200).json({
+    return response.status(200).json({
       user: userData,
       posts: posts,
       isFollowedByAdmin: userData.followers.some(
-        (e) => e.username === req.user.username
+        (e) => e.username === request.user.username
       ),
     });
   } catch (err) {
-    return res.status(422).json({ error: err });
+    return response.status(422).json({ error: err });
   }
 });
 
 // Follow users
-router.put("/v1/follow/:username", authorization, async (req, res) => {
-  const { username } = req.params;
+router.put("/v1/follow/:username", authorization, async (request, response) => {
+  const { username } = request.params;
   try {
     const followedUser = await User.findOneAndUpdate(
       { username: username },
       {
-        $addToSet: { followers: req.user._id },
+        $addToSet: { followers: request.user._id },
       },
       { new: true }
     ).exec();
 
     if (followedUser) {
       var you = await User.findByIdAndUpdate(
-        req.user._id,
+        request.user._id,
         {
           $addToSet: { following: followedUser._id },
         },
@@ -180,90 +180,102 @@ router.put("/v1/follow/:username", authorization, async (req, res) => {
         .select("-_id following followers")
         .exec();
     }
-    return res.status(200).json({ data: you });
+    return response.status(200).json({ data: you });
   } catch (error) {
-    res.status(500).json({ error: "Failed to follow the user." });
+    response.status(500).json({ error: "Failed to follow the user." });
   }
 });
 
 // Unfollow users
-router.put("/v1/unfollow/:username", authorization, async (req, res) => {
-  const { username } = req.params;
-  try {
-    const unfollowedUser = await User.findOneAndUpdate(
-      { username: username },
-      {
-        $pull: { followers: req.user._id },
-      },
-      { new: true }
-    ).exec();
-
-    if (unfollowedUser) {
-      var you = await User.findByIdAndUpdate(
-        req.user._id,
+router.put(
+  "/v1/unfollow/:username",
+  authorization,
+  async (request, response) => {
+    const { username } = request.params;
+    try {
+      const unfollowedUser = await User.findOneAndUpdate(
+        { username: username },
         {
-          $pull: { following: unfollowedUser._id },
+          $pull: { followers: request.user._id },
         },
         { new: true }
-      )
-        .select("-_id following followers")
-        .exec();
-    }
+      ).exec();
 
-    return res.status(200).json({ data: you });
-  } catch (error) {
-    res.status(500).json({ error: err });
+      if (unfollowedUser) {
+        var you = await User.findByIdAndUpdate(
+          request.user._id,
+          {
+            $pull: { following: unfollowedUser._id },
+          },
+          { new: true }
+        )
+          .select("-_id following followers")
+          .exec();
+      }
+
+      return response.status(200).json({ data: you });
+    } catch (error) {
+      response.status(500).json({ error: err });
+    }
   }
-});
+);
 
 // search user
-router.post("/search", (req, res) => {
+router.post("/search", (request, response) => {
   // "i" means ignoring case
-  let pattern = new RegExp("^" + req.body.query, "i");
+  let pattern = new RegExp("^" + request.body.query, "i");
 
   User.find({ name: { $regex: pattern } })
     .select("_id, -password")
     .then((user) => {
-      return res.json({ user });
+      return response.json({ user });
     })
     .catch((err) => {
-      return res.status(422).json({ err });
+      return response.status(422).json({ err });
     });
 });
 
 // Get following users list
-router.get("/v1/:username/following", authorization, async (req, res) => {
-  const { username } = req.params;
-  try {
-    const user = await User.findOne({ username: username }).exec();
-    if (!user) {
-      return res.status(422).json({ error: "failed to fetch data" });
+router.get(
+  "/v1/:username/following",
+  authorization,
+  async (request, response) => {
+    const { username } = request.params;
+    try {
+      const user = await User.findOne({ username: username }).exec();
+      if (!user) {
+        return response.status(422).json({ error: "failed to fetch data" });
+      }
+      const followingList = await User.find({ _id: user.following })
+        .select("-_id name username profilePhoto")
+        .exec();
+      return response.status(200).json({ following: followingList });
+    } catch (error) {
+      return response.status(500).json({ error });
     }
-    const followingList = await User.find({ _id: user.following })
-      .select("-_id name username profilePhoto")
-      .exec();
-    return res.status(200).json({ following: followingList });
-  } catch (error) {
-    return res.status(500).json({ error });
   }
-});
+);
 
 // Get followers list
-router.get("/v1/:username/followers", authorization, async (req, res) => {
-  const { username } = req.params;
-  try {
-    const user = await User.findOne({ username: username }).exec();
-    if (!user) {
-      return res.status(422).json({ error: "failed to fetch data" });
+router.get(
+  "/v1/:username/followers",
+  authorization,
+  async (request, response) => {
+    const { username } = request.params;
+    try {
+      const user = await User.findOne({ username: username }).exec();
+      if (!user) {
+        return response.status(422).json({ error: "failed to fetch data" });
+      }
+      const followingList = await User.find({ _id: user.followers })
+        .select("-_id name username profilePhoto")
+        .exec();
+      return response.status(200).json({ followers: followingList });
+    } catch (error) {
+      return response.status(500).json({ error });
     }
-    const followingList = await User.find({ _id: user.followers })
-      .select("-_id name username profilePhoto")
-      .exec();
-    return res.status(200).json({ followers: followingList });
-  } catch (error) {
-    return res.status(500).json({ error });
   }
-});
+);
 
 // Suggest Random User
 router.get("/v1/suggestion/users", authorization, async (request, response) => {
@@ -271,16 +283,24 @@ router.get("/v1/suggestion/users", authorization, async (request, response) => {
 
   try {
     let suggestedUsers = [];
-    const data = await User.find().select("-_id name username profilePhoto");
+    const data = await User.find({
+      username: { $ne: request.user.username },
+    }).select("-_id name username profilePhoto");
 
-    for (let i = 0; i < 5; i++) {
+    if (data.length === 0) {
+      return response
+        .status(200)
+        .json({ currentUser: { username }, suggestedUsers });
+    }
+
+    for (let i = 0; i < data.length; i++) {
       let randomIndex = Math.floor(Math.random() * data.length);
       suggestedUsers.push(data[randomIndex]);
     }
 
     response.status(200).json({ currentUser: { username }, suggestedUsers });
   } catch (error) {
-    return res.status(500).json({ error });
+    return response.status(500).json({ error });
   }
 });
 

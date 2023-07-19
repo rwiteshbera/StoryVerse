@@ -1,4 +1,4 @@
-# PixBy
+# StoryVerse
 
 ## A Full Stack Social Media Application
 
@@ -15,6 +15,6 @@
 
 ## Our Contributors
 
-<a href="https://github.com/rwiteshbera/Pixby/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=rwiteshbera/Pixby" />
+<a href="https://github.com/rwiteshbera/StoryVerse/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=rwiteshbera/StoryVerse" />
 </a>

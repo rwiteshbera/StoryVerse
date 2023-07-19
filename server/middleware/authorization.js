@@ -6,26 +6,26 @@ const User = mongoose.model("User");
 
 const secretKey = process.env.JWT_SECRET;
 
-module.exports = (req, res, next) => {
+module.exports = (request, response, next) => {
   try {
-    const authorization = req.cookies.authorization;
+    const authorization = request.cookies.authorization;
 
     // authorization === Bearer JSON_WEBTOKEN
     if (!authorization) {
-      return res.status(401).json({ error: "Authorization failed" });
+      return response.status(401).json({ error: "Authorization failed" });
     }
 
     const token = authorization.split(" ")[1];
 
     jwt.verify(token, secretKey, (error, payload) => {
       if (error) {
-        res.status(401).json({ isAuthorized: false, message: error });
+        response.status(401).json({ isAuthorized: false, message: error });
         return;
       }
-      req.user = payload;
+      request.user = payload;
       next();
     });
   } catch (error) {
-    return res.status(401).json({ error: "Authorization failed" });
+    return response.status(401).json({ error: "Authorization failed" });
   }
 };

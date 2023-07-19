@@ -18,8 +18,8 @@ const ViewFollowingFollowersModal = ({ data, type, onClose }) => {
   const fetcher = (url) =>
     axios
       .get(url, axiosConfig)
-      .then((res) => {
-        setList(res.data?.[type]);
+      .then((response) => {
+        setList(response.data?.[type]);
       })
       .catch((e) => {
         navigate("/");

@@ -8,8 +8,6 @@ import useSWR from "swr";
 const Home = () => {
   let navigate = useNavigate();
 
-
-
   return (
     <>
       <section className="grid grid-cols-4 gap-2 ">

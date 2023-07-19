@@ -9,9 +9,9 @@ const Suggested = () => {
   const fetcher = (url) =>
     axios
       .get(url)
-      .then((res) => {
-        setSuggestedAccounts(res.data?.suggestedUsers);
-        console.log(res.data?.suggestedUsers);
+      .then((response) => {
+        setSuggestedAccounts(response.data?.suggestedUsers);
+
       })
       .catch((e) => {
         navigate("/");

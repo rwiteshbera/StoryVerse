@@ -4,19 +4,20 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import axios from "axios";
-import useSWR from "swr";
+import useSWR from "swr/immutable";
 
 const Accounts = () => {
-  const AppTitle = "PixBy";
+  const AppTitle = "StoryVerse";
   let navigate = useNavigate();
 
   const fetcher = (url) =>
     axios
       .get(url)
-      .then((res) => {
-        if (res.data?.isAuthorized) {
-          navigate("/home");
+      .then((response) => {
+        if (response.data?.isAuthorized) {
+          return navigate("/home");
         }
+        navigate("/");
       })
       .catch((e) => {
         navigate("/");

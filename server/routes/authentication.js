@@ -16,31 +16,33 @@ SENDER_EMAIL_PASS = process.env.SENDER_EMAIL_PASS;
 SENDER_EMAIL = process.env.SENDER_EMAIL;
 SERVER_BASE_URL = process.env.SERVER_BASE_URL;
 
-router.get("/v1", authorization, (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ isAuthorized: false });
+router.get("/v1", authorization, (request, response) => {
+  if (!request.user) {
+    return response.status(401).json({ isAuthorized: false });
   }
-  return res.status(200).json({ isAuthorized: true, username: req.user.username });
+  return response
+    .status(200)
+    .json({ isAuthorized: true, username: request.user.username });
 });
 
 // Signup process
-router.post("/v1/signup", async (req, res) => {
+router.post("/v1/signup", async (request, response) => {
   // Check where the user has filled all the required fields
-  const { name, username, email, password } = req.body;
+  const { name, username, email, password } = request.body;
   if (!name || !username || !email || !password) {
-    return res.status(200).json({ message: "Please fill all the fields" });
+    return response.status(200).json({ message: "Please fill all the fields" });
   }
 
   // Validate Email
-  if (!emailValidator.validate(email)) {
-    return res.status(200).json({ message: "Please provide valid email" });
+  if (!emailValidator.validate(email.toLowerCase())) {
+    return response.status(200).json({ message: "Please provide valid email" });
   }
 
   // Hash the password
   let hashedPassword = await generateHashpassword(password);
 
   if (!hashedPassword) {
-    return res.status(503).json({
+    return response.status(503).json({
       message: "Service unavailable, Try again",
     });
   }
@@ -50,11 +52,11 @@ router.post("/v1/signup", async (req, res) => {
     .then((savedUser) => {
       if (savedUser) {
         if (savedUser.email === email) {
-          return res.status(200).json({
+          return response.status(200).json({
             message: `User already exists with ${email}`,
           });
         } else if (savedUser.username === username) {
-          return res.status(200).json({
+          return response.status(200).json({
             message: `User already exists with ${username}`,
           });
         }
@@ -62,40 +64,40 @@ router.post("/v1/signup", async (req, res) => {
 
       const newUser = new User({
         name: name,
-        username: username,
-        email: email,
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
         password: hashedPassword,
       });
 
       newUser
         .save()
         .then((user) => {
-          res
+          response
             .status(200)
             .json({ success: "true", message: "Account created successfully" });
         })
         .catch((err) => {
-          res.status(200).json({
+          response.status(200).json({
             message: "Unable to create account. Try again.",
           });
         });
     })
     .catch((err) => {
-      res.status(500).json({ message: err });
+      response.status(500).json({ message: err });
     });
 });
 
 // Login process // Login Process
 // [Email or Username + Password]
-router.post("/v1/login", async (req, res) => {
-  const { emailOrUsername, password } = req.body;
+router.post("/v1/login", async (request, response) => {
+  const { emailOrUsername, password } = request.body;
 
   // Fetch user platform details
-  const userPlatform = uaParser(req.headers["sec-ch-ua-platform"]).ua;
+  const userPlatform = uaParser(request.headers["sec-ch-ua-platform"]).ua;
 
   // Check where the user has filled all the required fields [Email or username & password]
   if (!emailOrUsername || !password) {
-    return res.status(200).json({ message: "Please fill all the fields" });
+    return response.status(200).json({ message: "Please fill all the fields" });
   }
 
   // Check if user exists with this email or username
@@ -105,7 +107,7 @@ router.post("/v1/login", async (req, res) => {
 
   // If user doesn't exists, send a response
   if (!savedUser) {
-    return res.status(200).json({ message: "Invalid credentials" });
+    return response.status(200).json({ message: "Invalid credentials" });
   }
 
   // Validate Password
@@ -116,7 +118,7 @@ router.post("/v1/login", async (req, res) => {
 
   // If password is not correct
   if (!isValidPassword) {
-    return res.status(200).json({ message: "Invalid credentials" });
+    return response.status(200).json({ message: "Invalid credentials" });
   }
 
   // If password is valid, sign a jwt token
@@ -138,11 +140,11 @@ router.post("/v1/login", async (req, res) => {
       { new: true },
       (err, result) => {
         if (err) {
-          return res.status(503).json({
+          return response.status(503).json({
             message: "Unable to activate your account. Try again later.",
           });
         } else {
-          return res.status(200).json({
+          return response.status(200).json({
             message:
               "Your account has been activated. Login once again to use.",
           });
@@ -167,7 +169,7 @@ router.post("/v1/login", async (req, res) => {
       }
     );
   } catch (err) {
-    return res.status(500).json({
+    return response.status(500).json({
       message: err,
     });
   }
@@ -176,25 +178,26 @@ router.post("/v1/login", async (req, res) => {
   const expiryDays = 1000 * 60 * 60 * 24 * 7; // 7 days
 
   // Store JWT token in cookie
-  res.cookie("authorization", `Bearer ${token}`, {
+  response.cookie("authorization", `Bearer ${token}`, {
     secure: true,
     httpOnly: true,
     maxAge: expiryDays,
-    sameSite: "none"
+    sameSite: "none",
   });
 
   // Store username in cookie
-  res.cookie("username", savedUser.username, {
+  response.cookie("username", savedUser.username, {
     secure: true,
     httpOnly: true,
     maxAge: expiryDays,
   });
 
   // Send response
-  return res.status(200).json({
+  return response.status(200).json({
     success: true,
     name: savedUser.name,
     username: savedUser.name,
+    avatar: savedUser.profilePhoto,
   });
 });
 

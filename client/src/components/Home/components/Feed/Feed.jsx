@@ -12,22 +12,16 @@ const Feed = () => {
   const fetcher = (url) =>
     axios
       .get(url)
-      .then((res) => {
-        const feed = res.data?.message.map((post) => {
-          if (post.likes.some((like) => like.username === "rwitesh")) {
-            return { ...post, adminLiked: true };
-          }
-          return post;
-        });
-        setFeedPosts(feed.reverse());
+      .then((response) => {
+        setFeedPosts(response.data?.message.reverse());
       })
       .catch((e) => {
-        navigate("/");
+        console.log(e)
       });
 
   const { data, error, isLoading } = useSWR("/v1/feed", fetcher, {
     revalidateIfStale: false,
-    revalidateOnFocus: true,
+    revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
   if (isLoading) {

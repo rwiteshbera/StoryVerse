@@ -36,6 +36,9 @@ const Login = ({ title }) => {
       if (!data.success) {
         return console.log(data);
       }
+      const { avatar, name, username } = data;
+      console.log(data);
+      localStorage.setItem("user", JSON.stringify({ avatar, name, username }));
       navigate("/home");
     } catch (error) {
       console.log(error?.response?.data.message);
