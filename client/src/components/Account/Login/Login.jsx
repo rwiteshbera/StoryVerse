@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const Login = ({ title }) => {
@@ -27,21 +29,24 @@ const Login = ({ title }) => {
   const LoginFunction = async () => {
     // Check if all the fields are filled
     if (!loginState.emailOrUsername || !loginState.password) {
-      console.log({ message: "Please fill all the fields" });
+      toast.warning("Please fill all the fields");
       return;
     }
 
     try {
       const { data } = await axios.post("/v1/login", loginState, axiosConfig);
       if (!data.success) {
-        return console.log(data);
+        return toast(data.message);
       }
       const { avatar, name, username } = data;
       console.log(data);
       localStorage.setItem("user", JSON.stringify({ avatar, name, username }));
-      navigate("/home");
+      toast.success("Login successful");
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
     } catch (error) {
-      console.log(error?.response?.data.message);
+      toast.error(error?.response?.data.message);
     }
   };
 
@@ -53,6 +58,12 @@ const Login = ({ title }) => {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        newestOnTop={true}
+      />
       <div className="flex flex-col gap-y-2 h-96 w-80 border-2 justify-center items-center border-gray-600 rounded-md p-4 ">
         <h2 className="text-center font-semibold text-3xl mb-1">{title}</h2>
         <input

@@ -26,7 +26,7 @@ const Suggested = () => {
     <section className="mt-4 mx-2 lg:block hidden">
       <p className="text-gray-400">Suggested For You</p>
       {suggestedAccounts &&
-        suggestedAccounts.map((user, key) => {
+        suggestedAccounts.slice(0,5).map((user, key) => {
           return <User data={user} key={key} />;
         })}
     </section>

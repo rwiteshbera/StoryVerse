@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useSWRConfig } from "swr";
 
 const CreateNewPostModal = ({ onClose }) => {
@@ -57,21 +59,22 @@ const CreateNewPostModal = ({ onClose }) => {
     imageData.append("caption", captionText);
 
     try {
-      const { data} = await axios.post(
-        "/v1/upload",
-        imageData,
-        axiosConfig
-      );
+      const { data } = await axios.post("/v1/upload", imageData, axiosConfig);
       mutate("/v1/user/posts");
-      console.log(data);
     } catch (error) {
-      console.log(error);
+      toast.error(error.data?.messages)
     } finally {
       modalCloseHandler();
     }
   };
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        newestOnTop={true}
+      />
       <div className="bg-black absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col justify-center items-center rounded-2xl py-2">
         <div className="">
           <p className="text-2xl">Create New Post</p>

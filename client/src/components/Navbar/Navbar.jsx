@@ -15,7 +15,6 @@ const Navbar = () => {
   const localUser = JSON.parse(localStorage.getItem("user"));
   const avatarLink = localUser?.avatar;
   useEffect(() => {
-    console.log("da");
     if (!localUser) {
       navigate("/");
     }

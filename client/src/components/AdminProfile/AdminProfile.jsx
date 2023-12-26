@@ -35,6 +35,9 @@ const AdminProfile = () => {
         })
         .then((response) => {
           setProfileData(response.data?.message);
+        })
+        .catch((e) => {
+          console.log(e)
         });
     },
     {

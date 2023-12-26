@@ -18,11 +18,7 @@ const UserProfile = ({}) => {
 
   // Get the username from the params
   const { username } = useParams();
-  // if(JSON.parse(localStorage.getItem("user")).username.toLowerCase() === username) {
-  //   navigate("/home/user");
-  // }
 
-  // Follow or Unfollow user
   const FollowHandler = async () => {
     try {
       await axios.put(`/v1/follow/${profileData.username}`);
@@ -69,10 +65,6 @@ const UserProfile = ({}) => {
   if (error) {
     window.location.reload();
   }
-
-
-   
-
 
   if (isLoading) {
     return <section className="mt-10 text-2xl text-center">Loading...</section>;

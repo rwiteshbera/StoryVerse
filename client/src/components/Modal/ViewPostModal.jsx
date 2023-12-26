@@ -57,8 +57,7 @@ const ViewPostModal = ({ onClose, image }) => {
   };
 
   return (
-    <div className="bg-black absolute top-[40%] left-[50%] translate-x-[-50%] translate-y-[-40%] rounded-2xl  md:w-[40vw] w-screen">
-
+    <div className="bg-black absolute top-[40%] left-[50%] translate-x-[-50%] translate-y-[-40%] rounded-2xl  md:w-[30vw] w-screen">
       <AiOutlineCloseCircle
         size={24}
         onClick={() => modalCloseHandler()}
@@ -129,12 +128,16 @@ const ViewPostModal = ({ onClose, image }) => {
             )}
           </div>
         </div>
-        <textarea
-          className="p-2 resize-none text-sm"
-          placeholder={image.captions}
-          rows={3}
-          disabled
-        />
+        {image.captions !== "undefined" ? (
+          <textarea
+            className="p-2 resize-none text-sm"
+            placeholder={image.captions}
+            rows={2}
+            disabled
+          />
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

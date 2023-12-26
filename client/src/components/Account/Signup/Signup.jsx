@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const Signup = ({ title }) => {
   let navigate = useNavigate();
@@ -41,29 +42,60 @@ const Signup = ({ title }) => {
       !signupState.password ||
       !signupState.confirmPassword
     ) {
-      console.log({ message: "Please fill all the fields" });
+      toast.warn("Please fill all the fields");
       return;
     }
 
     // Confirm password === confirm Password
     if (signupState.password !== signupState.confirmPassword) {
-      console.log({ message: "Password doesn't match" });
+      toast.warn("Password doesn't match");
       return;
     }
 
     try {
+      const emailOrUsername = signupState.email || signupState.username;
+      const password = signupState.password;
       const { data } = await axios.post("/v1/signup", signupState, axiosConfig);
       if (!data.success) {
-        return console.log(data);
+        return toast(data.message);
       }
-      navigate("/");
+      toast.success("Registration Successful");
+      axios
+        .post("/v1/login", { emailOrUsername, password }, axiosConfig)
+        .then((res) => {
+          if (!res.data?.success) {
+            return toast(data.message);
+          }
+          if (data) {
+            const { avatar, name, username } = res.data;
+            console.log(data);
+            localStorage.setItem(
+              "user",
+              JSON.stringify({ avatar, name, username })
+            );
+            setTimeout(() => {
+              navigate("/home");
+            }, 3000);
+          }
+        })
+        .catch((e) => {
+          navigate("/");
+        });
     } catch (error) {
-      console.log(error?.response?.data.message);
+      console.log(error);
+      toast.error(error?.response?.data.message);
+      return;
     }
   };
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        newestOnTop={true}
+      />
       <div className="flex flex-col gap-y-2 h-96 w-80 border-2 justify-center items-center border-gray-600 rounded-md p-4 ">
         <h2 className="text-center font-semibold text-3xl mb-1">{title}</h2>
         <input

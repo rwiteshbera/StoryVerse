@@ -71,10 +71,18 @@ router.post(
     const extname = path.extname(request.file.originalname).toString();
     const file64 = parser.format(extname, request.file.buffer);
 
-    if (extname !== ".jpeg" && extname !== ".png" && extname !== ".jpg") {
+    if (
+      extname !== ".jpeg" &&
+      extname !== ".png" &&
+      extname !== ".jpg" &&
+      extname !== ".webp"
+    ) {
       response
         .status(415)
-        .json({ message: "only jpeg, jpg, png files are allowed" });
+        .json({
+          extension: extname,
+          message: "only jpeg, jpg, png, webp files are allowed",
+        });
       return;
     }
 
@@ -85,7 +93,7 @@ router.post(
         {
           unique_filename: true,
           overwrite: true,
-          allowed_formats: ["jpg", "png", "jpeg"],
+          allowed_formats: ["jpg", "png", "jpeg", "webp"],
           folder: request.user._id,
           image_metadata: true,
         }
