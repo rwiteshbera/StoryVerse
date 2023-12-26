@@ -1,13 +1,5 @@
 version: "3"
 services:
-  client:
-    build:
-      context: ./client
-    image: storyverse-client-app
-    ports:
-      - "3000:3000"
-    env_file: ./client/.env
-    command: sh -c "npm install && npm run dev"
   server:
     build:
       context: ./server

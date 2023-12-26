@@ -28,7 +28,7 @@ router.post("/settings/edit&profile/name&gender", requireLogin, (request, respon
   }
 });
 
-// Check your username
+// Change your username
 router.post("/settings/edit&profile/username", requireLogin, (request, response) => {
   const { username } = request.body;
 
